@@ -1,6 +1,7 @@
 package model;
 
 public class User {
+
     private int id;
     private String username;
     private String password;
@@ -13,9 +14,20 @@ public class User {
         this.role = role;
     }
 
-    // Getters
-    public String getUsername() { return username; }
-    public String getPassword() { return password; }
-    public String getRole() { return role; }
-}
+    // GETTERS
+    public int getId() {
+        return id;
+    }
 
+    public String getUsername() {
+        return username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public String getRole() {
+        return role;
+    }
+}

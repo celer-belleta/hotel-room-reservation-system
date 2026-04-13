@@ -23,4 +23,4 @@ public class DBConnection {
 }
 
 // call this para ma connect ang system sa database
-// db.DC.getConnection();
+// db.DBConnection.getConnection();
