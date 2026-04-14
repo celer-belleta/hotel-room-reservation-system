@@ -10,7 +10,7 @@ import java.sql.*;
 public class LoginForm extends JFrame {
 
     JTextField usernameField;
-    JPasswordField passwordField;
+    JPasswordField passwordField;   
     JButton loginButton;
     JLabel errorLabel;
 

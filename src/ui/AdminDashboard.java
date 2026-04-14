@@ -30,18 +30,22 @@ public class AdminDashboard extends JFrame {
         panel.setLayout(new GridBagLayout());
 
         JPanel buttons = new JPanel();
-        buttons.setLayout(new GridLayout(4, 1, 20, 20));
+        // Changed to 5 rows to fit the restored button
+        buttons.setLayout(new GridLayout(5, 1, 20, 20));
 
         JButton viewUsersBtn = new JButton("View Users");
         JButton addUserBtn = new JButton("Add User");
+        JButton viewRoomsBtn = new JButton("Manage Rooms");
         JButton logoutBtn = new JButton("Logout");
 
         viewUsersBtn.setFont(new Font("Arial", Font.BOLD, 20));
         addUserBtn.setFont(new Font("Arial", Font.BOLD, 20));
+        viewRoomsBtn.setFont(new Font("Arial", Font.BOLD, 20));
         logoutBtn.setFont(new Font("Arial", Font.BOLD, 20));
 
         buttons.add(viewUsersBtn);
         buttons.add(addUserBtn);
+        buttons.add(viewRoomsBtn);
         buttons.add(logoutBtn);
 
         panel.add(buttons);
@@ -53,7 +57,9 @@ public class AdminDashboard extends JFrame {
 
         viewUsersBtn.addActionListener(e -> new UserTableFrame());
 
-        addUserBtn.addActionListener(e -> new AddUserFrame());
+        addUserBtn.addActionListener(e -> new AddUserFrame(null).setVisible(true));
+
+        viewRoomsBtn.addActionListener(e -> new RoomManagementFrame().setVisible(true));
 
         logoutBtn.addActionListener(e -> {
             dispose();
@@ -61,9 +67,5 @@ public class AdminDashboard extends JFrame {
         });
 
         setVisible(true);
-    }
-
-    public static void main(String[] args) {
-        new AdminDashboard();
     }
 }

@@ -8,7 +8,6 @@ public class Main {
         new LoginForm().setVisible(true);
 
         // DBConnection.getConnection();
-        //
 
     } // main
 } // class

@@ -9,9 +9,9 @@ public class AddUserFrame extends JFrame {
 
     private JTextField usernameField;
     private JTextField passwordField;
-    private JTextField roleField;
+    private JComboBox<String> roleComboBox;
 
-    public AddUserFrame() {
+    public AddUserFrame(UserTableFrame parent) {
 
         setTitle("Add User");
         setSize(400, 300);
@@ -27,8 +27,9 @@ public class AddUserFrame extends JFrame {
         add(passwordField);
 
         add(new JLabel("Role:"));
-        roleField = new JTextField();
-        add(roleField);
+        String[] roles = {"Admin", "Clerk"};
+        roleComboBox = new JComboBox<>(roles);
+        add(roleComboBox);
 
         JButton addBtn = new JButton("Add User");
 
@@ -44,7 +45,7 @@ public class AddUserFrame extends JFrame {
 
         String username = usernameField.getText();
         String password = passwordField.getText();
-        String role = roleField.getText();
+        String role = (String) roleComboBox.getSelectedItem();
 
         if (username.isEmpty() || password.isEmpty() || role.isEmpty()) {
             JOptionPane.showMessageDialog(this, "All fields are required!");
