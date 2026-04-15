@@ -1,31 +1,32 @@
 -- Hotel Management System Database Schema
 
--- Users table (already exists, assuming)
--- CREATE TABLE users (
---     id INT AUTO_INCREMENT PRIMARY KEY,
---     username VARCHAR(50) UNIQUE NOT NULL,
---     password VARCHAR(50) NOT NULL,
---     role VARCHAR(20) NOT NULL
--- );
+-- Users table
+CREATE TABLE users (
+     id INT AUTO_INCREMENT PRIMARY KEY,
+     username VARCHAR(50) UNIQUE NOT NULL,
+     password VARCHAR(50) NOT NULL,
+     role VARCHAR(20) NOT NULL
+ );
 
 -- Rooms table
 CREATE TABLE rooms (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    room_number VARCHAR(10) UNIQUE NOT NULL,
-    type VARCHAR(20) NOT NULL, -- Superior, Deluxe, Family, Suite
-    status VARCHAR(20) DEFAULT 'Available', -- Available, Booked, Maintenance
-    price DECIMAL(10,2) NOT NULL,
-    amenities TEXT -- Comma-separated list or JSON
+   id INT AUTO_INCREMENT PRIMARY KEY,
+   room_number VARCHAR(10) UNIQUE NOT NULL,
+   type ENUM('Superior', 'Deluxe', 'Family', 'Suite') NOT NULL,
+   price DECIMAL(10,2) NOT NULL,
+   status ENUM('Available', 'Booked', 'Maintenance') DEFAULT 'Available',
+   amenities TEXT
 );
 
 -- Guests table
 CREATE TABLE guests (
-    id INT AUTO_INCREMENT PRIMARY KEY,
+    guest_id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
-    contact VARCHAR(20),
-    id_number VARCHAR(20) UNIQUE,
-    email VARCHAR(50)
+    contact VARCHAR(50),
+    id_number VARCHAR(50)
 );
+
+-- NOT YET (stil making this)
 
 -- Packages table
 CREATE TABLE packages (

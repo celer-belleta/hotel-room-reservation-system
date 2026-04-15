@@ -126,3 +126,5 @@ public class LoginForm extends JFrame {
         }
     }
 }
+
+// e.printStackTrace(); prints every ERROR on the terminal for you to debug

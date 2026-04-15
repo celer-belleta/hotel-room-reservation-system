@@ -6,15 +6,45 @@ import java.awt.*;
 public class ClerkDashboard extends JFrame {
 
     public ClerkDashboard() {
-
         setTitle("Clerk Dashboard");
         setExtendedState(JFrame.MAXIMIZED_BOTH);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
-        JLabel title = new JLabel("CLERK DASHBOARD", SwingConstants.CENTER);
+        // TITLE
+        JLabel title = new JLabel("RECEPTION MANAGEMENT", SwingConstants.CENTER);
         title.setFont(new Font("Arial", Font.BOLD, 50));
+        add(title, BorderLayout.NORTH);
 
-        add(title, BorderLayout.CENTER);
+        // BUTTON PANEL
+        JPanel panel = new JPanel(new GridBagLayout());
+        JPanel buttons = new JPanel(new GridLayout(3, 1, 20, 20));
+
+        JButton registerGuestBtn = new JButton("Register New Guest");
+        JButton viewRoomsBtn = new JButton("Check Room Availability");
+        JButton logoutBtn = new JButton("Logout");
+
+        // Font styling
+        registerGuestBtn.setFont(new Font("Arial", Font.BOLD, 20));
+        viewRoomsBtn.setFont(new Font("Arial", Font.BOLD, 20));
+        logoutBtn.setFont(new Font("Arial", Font.BOLD, 20));
+
+        buttons.add(registerGuestBtn);
+        buttons.add(viewRoomsBtn);
+        buttons.add(logoutBtn);
+
+        panel.add(buttons);
+        add(panel, BorderLayout.CENTER);
+
+        // ACTIONS
+        registerGuestBtn.addActionListener(e -> new AddGuestFrame(this).setVisible(true));
+
+        // Clerks can also see rooms, but maybe not edit them!
+        viewRoomsBtn.addActionListener(e -> new RoomManagementFrame().setVisible(true));
+
+        logoutBtn.addActionListener(e -> {
+            dispose();
+            new LoginForm().setVisible(true);
+        });
     }
 }

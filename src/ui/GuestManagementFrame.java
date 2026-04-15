@@ -1,24 +1,24 @@
 package ui;
 
-import dao.RoomDB;
-import model.Room;
+import dao.GuestDB;
+import model.Guest;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.ArrayList;
 
-public class RoomManagementFrame extends JFrame {
-    private JTable roomTable;
+public class GuestManagementFrame extends JFrame {
+    private JTable guestTable;
     private DefaultTableModel tableModel;
-    private RoomDB roomDB;
+    private GuestDB guestDB;
 
-    public RoomManagementFrame() {
-        roomDB = new RoomDB();
+    public GuestManagementFrame() {
+        guestDB = new GuestDB();
 
         // =========================
         // FRAME SETTINGS
         // =========================
-        setTitle("Room Management");
+        setTitle("Guest Management");
         setSize(800, 500);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
@@ -27,26 +27,26 @@ public class RoomManagementFrame extends JFrame {
         // =========================
         // TABLE SETUP
         // =========================
-        String[] columns = {"ID", "Room #", "Type", "Price", "Status", "Amenities"};
+        String[] columns = {"ID", "Name", "Contact", "ID Number"};
         tableModel = new DefaultTableModel(columns, 0);
-        roomTable = new JTable(tableModel);
-        loadRooms();
+        guestTable = new JTable(tableModel);
+        loadGuests();
 
-        add(new JScrollPane(roomTable), BorderLayout.CENTER);
+        add(new JScrollPane(guestTable), BorderLayout.CENTER);
 
         // =========================
         // BOTTOM PANEL (BUTTONS)
         // =========================
         JPanel buttonPanel = new JPanel();
 
-        JButton addBtn = new JButton("Add New Room");
+        JButton registerBtn = new JButton("Register New Guest");
 
         // SYMBOL REFRESH BUTTON
         JButton refreshBtn = new JButton("\u21BB");
         refreshBtn.setFont(new Font("Segoe UI Symbol", Font.BOLD, 18));
         refreshBtn.setToolTipText("Refresh Table");
 
-        buttonPanel.add(addBtn);
+        buttonPanel.add(registerBtn);
         buttonPanel.add(refreshBtn);
         add(buttonPanel, BorderLayout.SOUTH);
 
@@ -54,20 +54,23 @@ public class RoomManagementFrame extends JFrame {
         // BUTTON ACTIONS
         // =========================
 
-        refreshBtn.addActionListener(e -> loadRooms());
+        refreshBtn.addActionListener(e -> loadGuests());
 
-        // This will open the form to add rooms
-        addBtn.addActionListener(e -> new AddRoomFrame(this).setVisible(true));
+        registerBtn.addActionListener(e -> new AddGuestFrame(this).setVisible(true));
+
+        setVisible(true);
     }
 
-    // LOAD ROOMS METHOD
-    public void loadRooms() {
+    // LOAD GUESTS METHOD
+    public void loadGuests() {
         tableModel.setRowCount(0);
-        ArrayList<Room> rooms = roomDB.getAllRooms();
-        for (Room r : rooms) {
+        ArrayList<Guest> guests = guestDB.getAllGuests();
+        for (Guest g : guests) {
             tableModel.addRow(new Object[]{
-                    r.getId(), r.getRoomNumber(), r.getType(),
-                    r.getPrice(), r.getStatus(), r.getAmenities()
+                    g.getGuestId(),
+                    g.getName(),
+                    g.getContact(),
+                    g.getIdNumber()
             });
         }
     }

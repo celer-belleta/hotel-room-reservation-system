@@ -3,6 +3,7 @@ package dao;
 import db.DBConnection;
 import model.User;
 
+import javax.swing.*;
 import java.sql.*;
 import java.util.ArrayList;
 
@@ -35,7 +36,7 @@ public class UserDB {
     }
 
     // ADD USER
-    public void addUser(String username, String password, String role) {
+    public boolean addUser(String username, String password, String role) {
         String sql = "INSERT INTO users (username, password, role) VALUES (?, ?, ?)";
 
         try (Connection conn = DBConnection.getConnection();
@@ -47,9 +48,22 @@ public class UserDB {
 
             ps.executeUpdate();
             System.out.println("User added successfully!");
+            return true;
 
         } catch (SQLException e) {
             e.printStackTrace();
+            if (e.getErrorCode() == 1062) {
+                JOptionPane.showMessageDialog(null,
+                        "The username is already taken. Please try a different one.",
+                        "Registration Error",
+                        JOptionPane.WARNING_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(null,
+                        "An unexpected database error occurred.",
+                        "System Error",
+                        JOptionPane.ERROR_MESSAGE);
+            }
+            return false;
         }
     }
 

@@ -1,0 +1,21 @@
+HOTEL RESERVATION AND ROOM MANAGEMENT SYSTEM (module files list)
+
+1. User Management Module (DONE)
+    Files: User.java, UserDB.java, LoginForm.java,
+           AdminDashboard.java, ClerkDashboard.java,
+           UserTableFrame.java, AddUserFrame.java
+
+    Note: Handles role-based access for Admin and Clerk.
+          Uses UNIQUE 'username' as a Primary Key for user accounts. (para way duplications sa username)
+
+2. Room Management Module (DONE)
+    Files: Room.java, RoomDB.java, RoomManagementFrame.java, AddRoomFrame.java
+
+    Note: Uses ENUM for Room Type and Status.
+          Para if mali ang input, dili ma-save sa database.
+
+3. Guest Management Module (DONE)
+    Files: Guest.java, GuestDB.java, GuestManagementFrame.java, AddGuestFrame.java
+
+    Notes: Uses 'guest_id' as a Primary Key.
+           Acts as a unique number for each guest.

@@ -42,20 +42,21 @@ public class AddUserFrame extends JFrame {
     }
 
     private void addUser() {
-
         String username = usernameField.getText();
         String password = passwordField.getText();
         String role = (String) roleComboBox.getSelectedItem();
 
-        if (username.isEmpty() || password.isEmpty() || role.isEmpty()) {
+        if (username.isEmpty() || password.isEmpty()) {
             JOptionPane.showMessageDialog(this, "All fields are required!");
             return;
         }
 
         UserDB db = new UserDB();
-        db.addUser(username, password, role);
+        boolean success = db.addUser(username, password, role);
 
-        JOptionPane.showMessageDialog(this, "User added!");
-        dispose();
+        if (success) {
+            JOptionPane.showMessageDialog(this, "User added successfully!");
+            dispose(); // Closes the window
+        }
     }
 }
