@@ -6,7 +6,8 @@ HOTEL RESERVATION AND ROOM MANAGEMENT SYSTEM (module files list)
            UserTableFrame.java, AddUserFrame.java
 
     Note: Handles role-based access for Admin and Clerk.
-          Uses UNIQUE 'username' as a Primary Key for user accounts. (para way duplications sa username)
+          Uses UNIQUE 'username' as a Primary Key for user accounts.
+            (para way duplications sa username).
 
 2. Room Management Module (DONE)
     Files: Room.java, RoomDB.java, RoomManagementFrame.java, AddRoomFrame.java
@@ -19,3 +20,10 @@ HOTEL RESERVATION AND ROOM MANAGEMENT SYSTEM (module files list)
 
     Notes: Uses 'guest_id' as a Primary Key.
            Acts as a unique number for each guest.
+
+4. Reservation Management Module (DONE)
+    Files: Reservation.java, ReservationDB.java,
+           ReservationManagementFrame.java, AddReservationFrame.java
+
+    Notes: Implemented the Availability Check feature to prevent double-booking of rooms.
+           Connects guests and the room together using their unique IDs.

@@ -41,12 +41,15 @@ public class GuestManagementFrame extends JFrame {
 
         JButton registerBtn = new JButton("Register New Guest");
 
+        JButton deleteBtn = new JButton("Delete Guest");
+
         // SYMBOL REFRESH BUTTON
         JButton refreshBtn = new JButton("\u21BB");
         refreshBtn.setFont(new Font("Segoe UI Symbol", Font.BOLD, 18));
         refreshBtn.setToolTipText("Refresh Table");
 
         buttonPanel.add(registerBtn);
+        buttonPanel.add(deleteBtn);
         buttonPanel.add(refreshBtn);
         add(buttonPanel, BorderLayout.SOUTH);
 
@@ -57,6 +60,30 @@ public class GuestManagementFrame extends JFrame {
         refreshBtn.addActionListener(e -> loadGuests());
 
         registerBtn.addActionListener(e -> new AddGuestFrame(this).setVisible(true));
+
+        deleteBtn.addActionListener(e -> {
+            int row = guestTable.getSelectedRow();
+            if (row != -1) {
+                // Get the Guest ID from the first column
+                int id = (int) tableModel.getValueAt(row, 0);
+
+                int confirm = JOptionPane.showConfirmDialog(this,
+                        "Are you sure you want to delete this guest?", "Confirm", JOptionPane.YES_NO_OPTION);
+
+                if (confirm == JOptionPane.YES_OPTION) {
+                    if (guestDB.deleteGuest(id)) {
+                        JOptionPane.showMessageDialog(this, "Guest deleted!");
+                        loadGuests();
+                    } else {
+                        JOptionPane.showMessageDialog(this,
+                                "Error: Cannot delete guest. They might have an active reservation!",
+                                "Delete Failed", JOptionPane.ERROR_MESSAGE);
+                    }
+                }
+            } else {
+                JOptionPane.showMessageDialog(this, "Please select a guest to delete.");
+            }
+        });
 
         setVisible(true);
     }

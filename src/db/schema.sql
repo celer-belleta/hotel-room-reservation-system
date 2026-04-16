@@ -26,6 +26,20 @@ CREATE TABLE guests (
     id_number VARCHAR(50)
 );
 
+CREATE TABLE reservations (
+    res_id INT AUTO_INCREMENT PRIMARY KEY,
+    guest_id INT NOT NULL,
+    room_id INT NOT NULL,
+    check_in DATE NOT NULL,
+    check_out DATE NOT NULL,
+    status ENUM('Pending', 'Confirmed', 'Cancelled') DEFAULT 'Pending',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    -- Links to ensure you can't book for a ghost guest or non-existent room
+    FOREIGN KEY (guest_id) REFERENCES guests(guest_id),
+    FOREIGN KEY (room_id) REFERENCES rooms(id)
+);
+
 -- NOT YET (stil making this)
 
 -- Packages table

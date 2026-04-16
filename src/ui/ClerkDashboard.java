@@ -18,19 +18,22 @@ public class ClerkDashboard extends JFrame {
 
         // BUTTON PANEL
         JPanel panel = new JPanel(new GridBagLayout());
-        JPanel buttons = new JPanel(new GridLayout(3, 1, 20, 20));
+        JPanel buttons = new JPanel(new GridLayout(3, 2, 20, 20));
 
         JButton registerGuestBtn = new JButton("Register New Guest");
         JButton viewRoomsBtn = new JButton("Check Room Availability");
+        JButton resBtn = new JButton("Manage Reservations");
         JButton logoutBtn = new JButton("Logout");
 
         // Font styling
         registerGuestBtn.setFont(new Font("Arial", Font.BOLD, 20));
         viewRoomsBtn.setFont(new Font("Arial", Font.BOLD, 20));
+        resBtn.setFont(new Font("Arial", Font.BOLD, 20));
         logoutBtn.setFont(new Font("Arial", Font.BOLD, 20));
 
         buttons.add(registerGuestBtn);
         buttons.add(viewRoomsBtn);
+        buttons.add(resBtn);
         buttons.add(logoutBtn);
 
         panel.add(buttons);
@@ -39,8 +42,9 @@ public class ClerkDashboard extends JFrame {
         // ACTIONS
         registerGuestBtn.addActionListener(e -> new AddGuestFrame(this).setVisible(true));
 
-        // Clerks can also see rooms, but maybe not edit them!
         viewRoomsBtn.addActionListener(e -> new RoomManagementFrame().setVisible(true));
+
+        resBtn.addActionListener(e -> new ReservationManagementFrame().setVisible(true));
 
         logoutBtn.addActionListener(e -> {
             dispose();

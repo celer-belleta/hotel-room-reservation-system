@@ -37,19 +37,21 @@ public class AdminDashboard extends JFrame {
         JButton addUserBtn = new JButton("Add User");
         JButton viewRoomsBtn = new JButton("Manage Rooms");
         JButton viewGuestsBtn = new JButton("Manage Guests");
+        JButton resBtn = new JButton("Manage Reservations");
         JButton logoutBtn = new JButton("Logout");
 
         viewUsersBtn.setFont(new Font("Arial", Font.BOLD, 20));
         addUserBtn.setFont(new Font("Arial", Font.BOLD, 20));
         viewRoomsBtn.setFont(new Font("Arial", Font.BOLD, 20));
         viewGuestsBtn.setFont(new Font("Arial", Font.BOLD, 20));
+        resBtn.setFont(new Font("Arial", Font.BOLD, 20));
         logoutBtn.setFont(new Font("Arial", Font.BOLD, 20));
 
         buttons.add(viewUsersBtn);  // Row 1, Col 1
         buttons.add(addUserBtn);    // Row 1, Col 2
         buttons.add(viewRoomsBtn);  // Row 2, Col 1
         buttons.add(viewGuestsBtn); // Row 2, Col 2
-        buttons.add(new JLabel("")); // Empty space for balance
+        buttons.add(resBtn);        // Row 3, Col 1
         buttons.add(logoutBtn);     // Row 3, Col 2
 
         panel.add(buttons);
@@ -66,6 +68,8 @@ public class AdminDashboard extends JFrame {
         viewRoomsBtn.addActionListener(e -> new RoomManagementFrame().setVisible(true));
 
         viewGuestsBtn.addActionListener(e -> new GuestManagementFrame().setVisible(true));
+
+        resBtn.addActionListener(e -> new ReservationManagementFrame().setVisible(true));
 
         logoutBtn.addActionListener(e -> {
             dispose();

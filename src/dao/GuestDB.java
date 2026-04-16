@@ -51,4 +51,19 @@ public class GuestDB {
         }
         return list;
     }
+    public boolean deleteGuest(int guestId) {
+        String sql = "DELETE FROM guests WHERE guest_id = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, guestId);
+            int rowsAffected = ps.executeUpdate();
+            return rowsAffected > 0;
+
+        } catch (SQLException e) {
+            // This is where that "Foreign Key" error will show up in the terminal
+            e.printStackTrace();
+            return false;
+        }
+    }
 }
