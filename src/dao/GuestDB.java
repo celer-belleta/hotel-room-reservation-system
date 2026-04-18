@@ -10,7 +10,7 @@ import java.util.ArrayList;
 
 public class GuestDB {
 
-    // ADD GUEST METHOD
+    // ADD GUEST
     public void addGuest(String name, String contact, String idNumber) {
         String sql = "INSERT INTO guests (name, contact, id_number) VALUES (?, ?, ?)";
 
@@ -29,7 +29,7 @@ public class GuestDB {
         }
     }
 
-    // GET ALL GUESTS METHOD
+    // GET ALL GUESTS
     public ArrayList<Guest> getAllGuests() {
         ArrayList<Guest> list = new ArrayList<>();
         String sql = "SELECT * FROM guests";
@@ -51,6 +51,8 @@ public class GuestDB {
         }
         return list;
     }
+
+    // DELETE GUEST
     public boolean deleteGuest(int guestId) {
         String sql = "DELETE FROM guests WHERE guest_id = ?";
         try (Connection conn = DBConnection.getConnection();
@@ -61,7 +63,6 @@ public class GuestDB {
             return rowsAffected > 0;
 
         } catch (SQLException e) {
-            // This is where that "Foreign Key" error will show up in the terminal
             e.printStackTrace();
             return false;
         }

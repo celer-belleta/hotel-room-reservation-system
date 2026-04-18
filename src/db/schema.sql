@@ -1,4 +1,4 @@
--- Hotel Management System Database Schema
+-- Hotel Reservation and Room Management System Database Schema
 
 -- Users table
 CREATE TABLE users (
@@ -26,6 +26,7 @@ CREATE TABLE guests (
     id_number VARCHAR(50)
 );
 
+-- Rservations table
 CREATE TABLE reservations (
     res_id INT AUTO_INCREMENT PRIMARY KEY,
     guest_id INT NOT NULL,
@@ -41,6 +42,29 @@ CREATE TABLE reservations (
 );
 
 -- NOT YET (stil making this)
+-- Packages table
+-- Bills table
+-- Payments table
+-- Alerts table
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 -- Packages table
 CREATE TABLE packages (

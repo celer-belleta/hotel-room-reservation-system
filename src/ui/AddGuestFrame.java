@@ -8,7 +8,7 @@ public class AddGuestFrame extends JFrame {
 
     private JTextField txtName, txtContact, txtIdNumber;
     private GuestDB guestDB;
-    private JFrame parent; // Can be GuestManagementFrame later
+    private JFrame parent;
 
     public AddGuestFrame(JFrame parent) {
         this.parent = parent;
@@ -40,7 +40,7 @@ public class AddGuestFrame extends JFrame {
         add(saveBtn);
         add(cancelBtn);
 
-        // SAVE GUEST ACTION
+        // BUTTON ACTIONS
         saveBtn.addActionListener(e -> {
             String name = txtName.getText().trim();
             String contact = txtContact.getText().trim();
@@ -54,11 +54,9 @@ public class AddGuestFrame extends JFrame {
             guestDB.addGuest(name, contact, idNum);
             JOptionPane.showMessageDialog(this, "Guest Registered Successfully!");
 
-            // If we make a GuestManagementFrame later, we will refresh it here
             dispose();
         });
 
-        // CANCEL ACTION
         cancelBtn.addActionListener(e -> dispose());
     }
 }

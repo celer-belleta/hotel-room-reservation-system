@@ -33,6 +33,7 @@ public class AddUserFrame extends JFrame {
 
         JButton addBtn = new JButton("Add User");
 
+        // BUTTON ACTION
         addBtn.addActionListener(e -> addUser());
 
         add(new JLabel());

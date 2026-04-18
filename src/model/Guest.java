@@ -13,7 +13,7 @@ public class Guest {
         this.idNumber = idNumber;
     }
 
-    // GETTERS
+    // Getters
     public int getGuestId() { return guestId; }
     public String getName() { return name; }
     public String getContact() { return contact; }

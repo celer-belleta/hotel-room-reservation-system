@@ -2,7 +2,6 @@ package dao;
 
 import db.DBConnection;
 import model.Room;
-
 import java.sql.*;
 import java.util.ArrayList;
 
@@ -11,7 +10,7 @@ import java.util.ArrayList;
 
 public class RoomDB {
 
-    // ADD ROOM METHOD
+    // ADD ROOM
     public void addRoom(String roomNumber, String type, double price, String amenities) {
         String sql = "INSERT INTO rooms (room_number, type, price, status, amenities) VALUES (?, ?, ?, 'Available', ?)";
 
@@ -31,7 +30,7 @@ public class RoomDB {
         }
     }
 
-    // GET ALL ROOMS METHOD
+    // GET ALL ROOMS
     public ArrayList<Room> getAllRooms() {
         ArrayList<Room> list = new ArrayList<>();
         String sql = "SELECT * FROM rooms";
@@ -56,7 +55,7 @@ public class RoomDB {
         return list;
     }
 
-    // UPDATE STATUS METHOD
+    // UPDATE STATUS
     public void updateRoomStatus(int id, String status) {
         String sql = "UPDATE rooms SET status=? WHERE id=?";
 
@@ -74,7 +73,7 @@ public class RoomDB {
         }
     }
 
-    // UPDATE PRICE METHOD
+    // UPDATE PRICE
     public void updateRoomPrice(String type, double newPrice) {
         String sql = "UPDATE rooms SET price=? WHERE type=?";
 

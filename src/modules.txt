@@ -27,3 +27,8 @@ HOTEL RESERVATION AND ROOM MANAGEMENT SYSTEM (module files list)
 
     Notes: Implemented the Availability Check feature to prevent double-booking of rooms.
            Connects guests and the room together using their unique IDs.
+
+
+changes:
+  - only the reservation module uses the Setters
+    while others use refreshTable when updating the data.

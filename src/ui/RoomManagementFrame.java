@@ -15,18 +15,13 @@ public class RoomManagementFrame extends JFrame {
     public RoomManagementFrame() {
         roomDB = new RoomDB();
 
-        // =========================
-        // FRAME SETTINGS
-        // =========================
         setTitle("Room Management");
         setSize(800, 500);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
 
-        // =========================
         // TABLE SETUP
-        // =========================
         String[] columns = {"ID", "Room #", "Type", "Price", "Status", "Amenities"};
         tableModel = new DefaultTableModel(columns, 0);
         roomTable = new JTable(tableModel);
@@ -34,9 +29,7 @@ public class RoomManagementFrame extends JFrame {
 
         add(new JScrollPane(roomTable), BorderLayout.CENTER);
 
-        // =========================
         // BOTTOM PANEL (BUTTONS)
-        // =========================
         JPanel buttonPanel = new JPanel();
 
         JButton addBtn = new JButton("Add New Room");
@@ -50,17 +43,14 @@ public class RoomManagementFrame extends JFrame {
         buttonPanel.add(refreshBtn);
         add(buttonPanel, BorderLayout.SOUTH);
 
-        // =========================
         // BUTTON ACTIONS
-        // =========================
-
         refreshBtn.addActionListener(e -> loadRooms());
 
         // This will open the form to add rooms
         addBtn.addActionListener(e -> new AddRoomFrame(this).setVisible(true));
     }
 
-    // LOAD ROOMS METHOD
+    // LOAD ROOMS
     public void loadRooms() {
         tableModel.setRowCount(0);
         ArrayList<Room> rooms = roomDB.getAllRooms();

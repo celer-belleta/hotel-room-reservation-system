@@ -20,7 +20,7 @@ public class LoginForm extends JFrame {
         setExtendedState(JFrame.MAXIMIZED_BOTH);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
 
-        // ===== CENTER LAYOUT =====
+        // CENTER LAYOUT
         setLayout(new GridBagLayout());
 
         JPanel panel = new JPanel();
@@ -31,7 +31,7 @@ public class LoginForm extends JFrame {
         gbc.insets = new Insets(10, 10, 10, 10);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        // ===== TITLE =====
+        // TITLE
         JLabel title = new JLabel("HOTEL LOGIN SYSTEM");
         title.setFont(new Font("Arial", Font.BOLD, 50));
         gbc.gridx = 0;
@@ -41,7 +41,7 @@ public class LoginForm extends JFrame {
 
         gbc.gridwidth = 1;
 
-        // ===== USERNAME =====
+        // USERNAME
         JLabel userLabel = new JLabel("Username:");
         userLabel.setFont(new Font("Arial", Font.PLAIN, 24));
         gbc.gridx = 0;
@@ -53,7 +53,7 @@ public class LoginForm extends JFrame {
         gbc.gridx = 1;
         panel.add(usernameField, gbc);
 
-        // ===== PASSWORD =====
+        // PASSWORD
         JLabel passLabel = new JLabel("Password:");
         passLabel.setFont(new Font("Arial", Font.PLAIN, 24));
         gbc.gridx = 0;
@@ -65,7 +65,7 @@ public class LoginForm extends JFrame {
         gbc.gridx = 1;
         panel.add(passwordField, gbc);
 
-        // ===== LOGIN BUTTON =====
+        // LOGIN BUTTON
         loginButton = new JButton("LOGIN");
         loginButton.setFont(new Font("Arial", Font.BOLD, 22));
         gbc.gridx = 0;
@@ -73,7 +73,7 @@ public class LoginForm extends JFrame {
         gbc.gridwidth = 2;
         panel.add(loginButton, gbc);
 
-        // ===== ERROR LABEL =====
+        // ERROR LABEL
         errorLabel = new JLabel("");
         errorLabel.setFont(new Font("Arial", Font.PLAIN, 18));
         errorLabel.setForeground(Color.RED);
@@ -82,7 +82,7 @@ public class LoginForm extends JFrame {
 
         add(panel);
 
-        // ===== ACTION =====
+        // BUTTON ACTIONS
         loginButton.addActionListener(e -> login());
     }
 

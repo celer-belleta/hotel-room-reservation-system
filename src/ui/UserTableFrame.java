@@ -38,6 +38,7 @@ public class UserTableFrame extends JFrame {
         JButton deleteBtn = new JButton("Delete Selected User");
         JButton editBtn = new JButton("Edit Selected User");
 
+        // BUTTON ACTIONS
         deleteBtn.addActionListener(e -> deleteUser());
         editBtn.addActionListener(e -> editUser());
 

@@ -15,18 +15,14 @@ public class GuestManagementFrame extends JFrame {
     public GuestManagementFrame() {
         guestDB = new GuestDB();
 
-        // =========================
         // FRAME SETTINGS
-        // =========================
         setTitle("Guest Management");
         setSize(800, 500);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
 
-        // =========================
         // TABLE SETUP
-        // =========================
         String[] columns = {"ID", "Name", "Contact", "ID Number"};
         tableModel = new DefaultTableModel(columns, 0);
         guestTable = new JTable(tableModel);
@@ -34,9 +30,7 @@ public class GuestManagementFrame extends JFrame {
 
         add(new JScrollPane(guestTable), BorderLayout.CENTER);
 
-        // =========================
         // BOTTOM PANEL (BUTTONS)
-        // =========================
         JPanel buttonPanel = new JPanel();
 
         JButton registerBtn = new JButton("Register New Guest");
@@ -53,10 +47,7 @@ public class GuestManagementFrame extends JFrame {
         buttonPanel.add(refreshBtn);
         add(buttonPanel, BorderLayout.SOUTH);
 
-        // =========================
         // BUTTON ACTIONS
-        // =========================
-
         refreshBtn.addActionListener(e -> loadGuests());
 
         registerBtn.addActionListener(e -> new AddGuestFrame(this).setVisible(true));
@@ -64,7 +55,6 @@ public class GuestManagementFrame extends JFrame {
         deleteBtn.addActionListener(e -> {
             int row = guestTable.getSelectedRow();
             if (row != -1) {
-                // Get the Guest ID from the first column
                 int id = (int) tableModel.getValueAt(row, 0);
 
                 int confirm = JOptionPane.showConfirmDialog(this,
@@ -88,7 +78,7 @@ public class GuestManagementFrame extends JFrame {
         setVisible(true);
     }
 
-    // LOAD GUESTS METHOD
+    // LOAD GUESTS
     public void loadGuests() {
         tableModel.setRowCount(0);
         ArrayList<Guest> guests = guestDB.getAllGuests();

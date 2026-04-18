@@ -25,7 +25,6 @@ public class ClerkDashboard extends JFrame {
         JButton resBtn = new JButton("Manage Reservations");
         JButton logoutBtn = new JButton("Logout");
 
-        // Font styling
         registerGuestBtn.setFont(new Font("Arial", Font.BOLD, 20));
         viewRoomsBtn.setFont(new Font("Arial", Font.BOLD, 20));
         resBtn.setFont(new Font("Arial", Font.BOLD, 20));
@@ -39,7 +38,7 @@ public class ClerkDashboard extends JFrame {
         panel.add(buttons);
         add(panel, BorderLayout.CENTER);
 
-        // ACTIONS
+        // BUTTON ACTIONS
         registerGuestBtn.addActionListener(e -> new AddGuestFrame(this).setVisible(true));
 
         viewRoomsBtn.addActionListener(e -> new RoomManagementFrame().setVisible(true));

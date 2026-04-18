@@ -22,7 +22,6 @@ public class AddRoomFrame extends JFrame {
         setLocationRelativeTo(null);
         setLayout(new GridLayout(6, 2, 15, 15));
 
-        // COMPONENTS
         add(new JLabel(" Room Number:"));
         txtRoomNumber = new JTextField();
         add(txtRoomNumber);
@@ -46,7 +45,7 @@ public class AddRoomFrame extends JFrame {
         add(saveBtn);
         add(cancelBtn);
 
-        // SAVE ROOM METHOD
+        // SAVE ROOM
         saveBtn.addActionListener(e -> {
             try {
                 String num = txtRoomNumber.getText().trim();
@@ -73,7 +72,6 @@ public class AddRoomFrame extends JFrame {
             }
         });
 
-        // CANCEL METHOD
         cancelBtn.addActionListener(e -> dispose());
     }
 }

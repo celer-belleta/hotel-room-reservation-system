@@ -22,5 +22,5 @@ public class DBConnection {
     }
 }
 
-// call this para ma connect ang system sa database
+// import then call this para ma connect ang system sa database
 // db.DBConnection.getConnection();

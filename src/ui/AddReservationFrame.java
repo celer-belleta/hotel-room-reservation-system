@@ -15,7 +15,6 @@ public class AddReservationFrame extends JFrame {
         setLocationRelativeTo(null);
         setLayout(new GridLayout(6, 2, 10, 10));
 
-        // UI Components
         add(new JLabel("Guest ID:"));
         guestIdField = new JTextField();
         add(guestIdField);
@@ -35,7 +34,7 @@ public class AddReservationFrame extends JFrame {
         JButton saveBtn = new JButton("Confirm Booking");
         saveBtn.addActionListener(e -> bookRoom(parent));
 
-        add(new JLabel()); // Spacer
+        add(new JLabel()); // Empty cell for spacing
         add(saveBtn);
     }
 

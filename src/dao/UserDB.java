@@ -2,7 +2,6 @@ package dao;
 
 import db.DBConnection;
 import model.User;
-
 import javax.swing.*;
 import java.sql.*;
 import java.util.ArrayList;
@@ -12,7 +11,7 @@ import java.util.ArrayList;
 
 public class UserDB {
 
-    // LOGIN METHOD
+    // LOGIN
     public String login(String username, String password) {
         String role = null;
         String sql = "SELECT role FROM users WHERE username=? AND password=?";

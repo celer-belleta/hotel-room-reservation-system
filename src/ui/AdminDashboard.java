@@ -7,30 +7,23 @@ public class AdminDashboard extends JFrame {
 
     public AdminDashboard() {
 
-        // =========================
         // FRAME SETTINGS
-        // =========================
         setTitle("Admin Dashboard");
         setExtendedState(JFrame.MAXIMIZED_BOTH);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
-        // =========================
         // TITLE
-        // =========================
         JLabel title = new JLabel("OPERATIONS MANAGEMENT", SwingConstants.CENTER);
         title.setFont(new Font("Arial", Font.BOLD, 50));
 
         add(title, BorderLayout.NORTH);
 
-        // =========================
         // CENTER PANEL (BUTTONS)
-        // =========================
         JPanel panel = new JPanel();
         panel.setLayout(new GridBagLayout());
 
         JPanel buttons = new JPanel();
-        // Changed to 5 rows to fit the restored button
         buttons.setLayout(new GridLayout(3, 2, 20, 20));
 
         JButton viewUsersBtn = new JButton("View Users");
@@ -47,20 +40,18 @@ public class AdminDashboard extends JFrame {
         resBtn.setFont(new Font("Arial", Font.BOLD, 20));
         logoutBtn.setFont(new Font("Arial", Font.BOLD, 20));
 
-        buttons.add(viewUsersBtn);  // Row 1, Col 1
-        buttons.add(addUserBtn);    // Row 1, Col 2
-        buttons.add(viewRoomsBtn);  // Row 2, Col 1
-        buttons.add(viewGuestsBtn); // Row 2, Col 2
-        buttons.add(resBtn);        // Row 3, Col 1
-        buttons.add(logoutBtn);     // Row 3, Col 2
+        // 3 rows, 2 columns each
+        buttons.add(viewUsersBtn);
+        buttons.add(addUserBtn);
+        buttons.add(viewRoomsBtn);
+        buttons.add(viewGuestsBtn);
+        buttons.add(resBtn);
+        buttons.add(logoutBtn);
 
         panel.add(buttons);
         add(panel, BorderLayout.CENTER);
 
-        // =========================
         // BUTTON ACTIONS
-        // =========================
-
         viewUsersBtn.addActionListener(e -> new UserTableFrame());
 
         addUserBtn.addActionListener(e -> new AddUserFrame(null).setVisible(true));

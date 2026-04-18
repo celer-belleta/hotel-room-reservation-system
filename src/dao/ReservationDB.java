@@ -6,6 +6,10 @@ import javax.swing.JOptionPane;
 import java.sql.*;
 import java.util.ArrayList;
 
+// ReservationDB handles all database operations related to Bookings.
+// This includes checking room availability, creating new reservations,
+// and managing existing records (viewing and cancelling).
+
 public class ReservationDB {
 
     // AVAILABILITY CHECK (The "Overlap" Logic)
@@ -17,12 +21,14 @@ public class ReservationDB {
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, roomId);
-            ps.setDate(2, end);   // Closes the gap
+            ps.setDate(2, end); // Closes the gap
             ps.setDate(3, start); // Checks the start
 
             ResultSet rs = ps.executeQuery();
             if (rs.next()) return rs.getInt(1) == 0;
-        } catch (SQLException e) { e.printStackTrace(); }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return false;
     }
 
@@ -50,20 +56,21 @@ public class ReservationDB {
         }
     }
 
-    // CANCEL RESERVATION (Update Status)
-    public void cancelReservation(int resId) {
+    // CANCEL RESERVATION (returns true/false)
+    public boolean cancelReservation(int resId) {
         String sql = "UPDATE reservations SET status = 'Cancelled' WHERE res_id = ?";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, resId);
-            ps.executeUpdate();
-            System.out.println("Reservation Cancelled.");
+            // Returns true if 1 or more rows were updated
+            return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();
+            return false;
         }
     }
 
-    //  GET RESERVATIONS
+    // GET RESERVATIONS
     public ArrayList<Reservation> getAllReservations() {
         ArrayList<Reservation> list = new ArrayList<>();
         String sql = "SELECT * FROM reservations";
@@ -80,7 +87,9 @@ public class ReservationDB {
                         rs.getString("status")
                 ));
             }
-        } catch (SQLException e) { e.printStackTrace(); }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return list;
     }
 }
