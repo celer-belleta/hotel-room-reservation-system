@@ -58,14 +58,16 @@ public class AddRoomFrame extends JFrame {
                     return;
                 }
 
-                roomDB.addRoom(num, type, price, amenities);
+                if (roomDB.addRoom(num, type, price, amenities)) {
+                    JOptionPane.showMessageDialog(this, "Room " + num + " added successfully!");
 
-                JOptionPane.showMessageDialog(this, "Room " + num + " added successfully!");
-
-                if (parent != null) {
-                    parent.loadRooms(); // Refresh the table
+                    if (parent != null) {
+                        parent.loadRooms(); // Refresh the table
+                    }
+                    dispose();
+                } else {
+                    JOptionPane.showMessageDialog(this, "Error: Could not save room to database.", "Error", JOptionPane.ERROR_MESSAGE);
                 }
-                dispose();
 
             } catch (NumberFormatException ex) {
                 JOptionPane.showMessageDialog(this, "Please enter a valid number for the price.");

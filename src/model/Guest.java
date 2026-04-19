@@ -18,4 +18,9 @@ public class Guest {
     public String getName() { return name; }
     public String getContact() { return contact; }
     public String getIdNumber() { return idNumber; }
+
+    // Setters
+    public void setName(String name) { this.name = name; }
+    public void setContact(String contact) { this.contact = contact; }
+    public void setIdNumber(String idNumber) { this.idNumber = idNumber; }
 }

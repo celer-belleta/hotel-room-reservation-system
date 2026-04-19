@@ -24,4 +24,9 @@ public class Room {
     public double getPrice() { return price; }
     public String getStatus() { return status; }
     public String getAmenities() { return amenities; }
+
+    // Setters
+    public void setStatus(String status) { this.status = status; }
+    public void setPrice(double price) { this.price = price; }
+    public void setAmenities(String amenities) { this.amenities = amenities; }
 }

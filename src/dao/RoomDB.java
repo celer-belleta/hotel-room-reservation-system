@@ -11,7 +11,7 @@ import java.util.ArrayList;
 public class RoomDB {
 
     // ADD ROOM
-    public void addRoom(String roomNumber, String type, double price, String amenities) {
+    public boolean addRoom(String roomNumber, String type, double price, String amenities) {
         String sql = "INSERT INTO rooms (room_number, type, price, status, amenities) VALUES (?, ?, ?, 'Available', ?)";
 
         try (Connection conn = DBConnection.getConnection();
@@ -22,11 +22,11 @@ public class RoomDB {
             ps.setDouble(3, price);
             ps.setString(4, amenities);
 
-            ps.executeUpdate();
-            System.out.println("Room added successfully!");
+            return ps.executeUpdate() > 0;
 
         } catch (SQLException e) {
             e.printStackTrace();
+            return false;
         }
     }
 
@@ -55,8 +55,45 @@ public class RoomDB {
         return list;
     }
 
+    // UPDATE ROOM
+    public boolean updateRoom(int id, String roomNum, String type, double price, String amenities) {
+        String sql = "UPDATE rooms SET room_number=?, type=?, price=?, amenities=? WHERE id=?";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, roomNum);
+            ps.setString(2, type);
+            ps.setDouble(3, price);
+            ps.setString(4, amenities);
+            ps.setInt(5, id);
+
+            return ps.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    // DELETE ROOM
+    public boolean deleteRoom(int id) {
+        String sql = "DELETE FROM rooms WHERE id=?";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, id);
+            return ps.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     // UPDATE STATUS
-    public void updateRoomStatus(int id, String status) {
+    public boolean updateRoomStatus(int id, String status) {
         String sql = "UPDATE rooms SET status=? WHERE id=?";
 
         try (Connection conn = DBConnection.getConnection();
@@ -65,16 +102,16 @@ public class RoomDB {
             ps.setString(1, status);
             ps.setInt(2, id);
 
-            ps.executeUpdate();
-            System.out.println("Room status updated!");
+            return ps.executeUpdate() > 0;
 
         } catch (SQLException e) {
             e.printStackTrace();
+            return false;
         }
     }
 
     // UPDATE PRICE
-    public void updateRoomPrice(String type, double newPrice) {
+    public boolean updateRoomPrice(String type, double newPrice) {
         String sql = "UPDATE rooms SET price=? WHERE type=?";
 
         try (Connection conn = DBConnection.getConnection();
@@ -83,11 +120,11 @@ public class RoomDB {
             ps.setDouble(1, newPrice);
             ps.setString(2, type);
 
-            ps.executeUpdate();
-            System.out.println("Room updated!");
+            return ps.executeUpdate() > 0;
 
         } catch (SQLException e) {
             e.printStackTrace();
+            return false;
         }
     }
 }

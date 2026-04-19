@@ -85,9 +85,13 @@ public class UserTableFrame extends JFrame {
 
         int id = (int) table.getValueAt(row, 0);
 
-        userDB.deleteUser(id);
-
-        loadUsers();
+        // UPDATED: Now using boolean check to update UI without loadUsers()
+        if (userDB.deleteUser(id)) {
+            model.removeRow(row);
+            JOptionPane.showMessageDialog(this, "User deleted successfully!");
+        } else {
+            JOptionPane.showMessageDialog(this, "Error: Could not delete user.", "System Error", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     private void editUser() {
@@ -126,14 +130,19 @@ public class UserTableFrame extends JFrame {
                 return;
             }
 
-            userDB.updateUser(
-                    id,
-                    usernameField.getText(),
-                    passwordField.getText(),
-                    roleField.getText()
-            );
+            String newUsername = usernameField.getText();
+            String newPassword = passwordField.getText();
+            String newRole = roleField.getText();
 
-            loadUsers();
+            // UPDATED: Now using boolean check to update UI directly
+            if (userDB.updateUser(id, newUsername, newPassword, newRole)) {
+                model.setValueAt(newUsername, row, 1);
+                model.setValueAt(newPassword, row, 2);
+                model.setValueAt(newRole, row, 3);
+                JOptionPane.showMessageDialog(this, "User updated successfully!");
+            } else {
+                JOptionPane.showMessageDialog(this, "Error: Could not update user.", "System Error", JOptionPane.ERROR_MESSAGE);
+            }
         }
     }
 }

@@ -12,6 +12,8 @@ public class GuestManagementFrame extends JFrame {
     private DefaultTableModel tableModel;
     private GuestDB guestDB;
 
+    private ArrayList<Guest> guestList = new ArrayList<>();
+
     public GuestManagementFrame() {
         guestDB = new GuestDB();
 
@@ -32,9 +34,7 @@ public class GuestManagementFrame extends JFrame {
 
         // BOTTOM PANEL (BUTTONS)
         JPanel buttonPanel = new JPanel();
-
         JButton registerBtn = new JButton("Register New Guest");
-
         JButton deleteBtn = new JButton("Delete Guest");
 
         // SYMBOL REFRESH BUTTON
@@ -62,8 +62,11 @@ public class GuestManagementFrame extends JFrame {
 
                 if (confirm == JOptionPane.YES_OPTION) {
                     if (guestDB.deleteGuest(id)) {
+
+                        guestList.remove(row);
+                        tableModel.removeRow(row);
+
                         JOptionPane.showMessageDialog(this, "Guest deleted!");
-                        loadGuests();
                     } else {
                         JOptionPane.showMessageDialog(this,
                                 "Error: Cannot delete guest. They might have an active reservation!",
@@ -78,11 +81,12 @@ public class GuestManagementFrame extends JFrame {
         setVisible(true);
     }
 
-    // LOAD GUESTS
     public void loadGuests() {
         tableModel.setRowCount(0);
-        ArrayList<Guest> guests = guestDB.getAllGuests();
-        for (Guest g : guests) {
+
+        guestList = guestDB.getAllGuests();
+
+        for (Guest g : guestList) {
             tableModel.addRow(new Object[]{
                     g.getGuestId(),
                     g.getName(),

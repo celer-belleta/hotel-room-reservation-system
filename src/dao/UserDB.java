@@ -90,38 +90,37 @@ public class UserDB {
     }
 
     // DELETE USER
-    public void deleteUser(int id) {
+    public boolean deleteUser(int id) {
         String sql = "DELETE FROM users WHERE id=?";
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
-
             ps.setInt(1, id);
-            ps.executeUpdate();
-            System.out.println("User deleted successfully!");
+
+            return ps.executeUpdate() > 0;
 
         } catch (SQLException e) {
             e.printStackTrace();
+            return false;
         }
     }
 
     // UPDATE USER
-    public void updateUser(int id, String username, String password, String role) {
+    public boolean updateUser(int id, String username, String password, String role) {
         String sql = "UPDATE users SET username=?, password=?, role=? WHERE id=?";
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
-
             ps.setString(1, username);
             ps.setString(2, password);
             ps.setString(3, role);
             ps.setInt(4, id);
 
-            ps.executeUpdate();
-            System.out.println("User updated!");
+            return ps.executeUpdate() > 0;
 
         } catch (SQLException e) {
             e.printStackTrace();
+            return false;
         }
     }
 }

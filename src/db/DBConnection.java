@@ -24,3 +24,4 @@ public class DBConnection {
 
 // import then call this para ma connect ang system sa database
 // db.DBConnection.getConnection();
+// https://www.youtube.com/watch?v=7v2OnUti2eM

@@ -11,7 +11,7 @@ import java.util.ArrayList;
 public class GuestDB {
 
     // ADD GUEST
-    public void addGuest(String name, String contact, String idNumber) {
+    public boolean addGuest(String name, String contact, String idNumber) {
         String sql = "INSERT INTO guests (name, contact, id_number) VALUES (?, ?, ?)";
 
         try (Connection conn = DBConnection.getConnection();
@@ -21,11 +21,11 @@ public class GuestDB {
             ps.setString(2, contact);
             ps.setString(3, idNumber);
 
-            ps.executeUpdate();
-            System.out.println("Guest registered successfully!");
+            return ps.executeUpdate() > 0;
 
         } catch (SQLException e) {
             e.printStackTrace();
+            return false;
         }
     }
 
@@ -62,6 +62,25 @@ public class GuestDB {
             int rowsAffected = ps.executeUpdate();
             return rowsAffected > 0;
 
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    // UPDATE GUEST
+    public boolean updateGuest(int guestId, String name, String contact, String idNumber) {
+        String sql = "UPDATE guests SET name = ?, contact = ?, id_number = ? WHERE guest_id = ?";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, name);
+            ps.setString(2, contact);
+            ps.setString(3, idNumber);
+            ps.setInt(4, guestId);
+
+            return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();
             return false;

@@ -51,10 +51,17 @@ public class AddGuestFrame extends JFrame {
                 return;
             }
 
-            guestDB.addGuest(name, contact, idNum);
-            JOptionPane.showMessageDialog(this, "Guest Registered Successfully!");
+            if (guestDB.addGuest(name, contact, idNum)) {
+                JOptionPane.showMessageDialog(this, "Guest Registered Successfully!");
 
-            dispose();
+                if (parent instanceof GuestManagementFrame) {
+                    ((GuestManagementFrame) parent).loadGuests();
+                }
+
+                dispose();
+            } else {
+                JOptionPane.showMessageDialog(this, "Error: Could not register guest to database.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
         });
 
         cancelBtn.addActionListener(e -> dispose());

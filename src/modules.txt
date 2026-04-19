@@ -28,7 +28,12 @@ HOTEL RESERVATION AND ROOM MANAGEMENT SYSTEM (module files list)
     Notes: Implemented the Availability Check feature to prevent double-booking of rooms.
            Connects guests and the room together using their unique IDs.
 
+(Continuing tommorow finishing the Reservation Module where it will have edit and delete (CRUD)
+and guest management has edit guest too
 
 changes:
   - only the reservation module uses the Setters
     while others use refreshTable when updating the data.
+
+AN:
+    - DAO folder is just the structure to hide the SQL code from the main application logic.
