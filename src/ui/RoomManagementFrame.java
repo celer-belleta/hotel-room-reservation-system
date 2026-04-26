@@ -140,7 +140,7 @@ public class RoomManagementFrame extends JFrame {
         });
 
         // ROLE-BASED ACCESS
-        if (role.equalsIgnoreCase("Clerk")) {
+        if (!role.equalsIgnoreCase("Admin")) {
             addBtn.setVisible(false);
             editBtn.setVisible(false);
             deleteBtn.setVisible(false);

@@ -1,86 +1,73 @@
 package ui;
 
-import dao.RoomDB;
-import model.Room;
 import javax.swing.*;
 import java.awt.*;
-import java.util.ArrayList;
 
 public class GuestDashboard extends JFrame {
 
-    private JPanel roomListPanel; // This will hold all our room "cards"
+    private String currentUsername;
 
     public GuestDashboard(String username) {
-        // Basic Frame Setup
-        setTitle("MAAYO HOTEL - Welcome " + username);
-        setExtendedState(JFrame.MAXIMIZED_BOTH); // Opens in full screen
-        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        this.currentUsername = username;
+
+        // FRAME SETTINGS
+        setTitle("Guest Dashboard" + username);
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
-        //  HEADER SECTION
-        JLabel headerLabel = new JLabel("Available Rooms & Exclusive Offers", JLabel.CENTER);
-        headerLabel.setFont(new Font("Arial", Font.BOLD, 28));
-        headerLabel.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
-        add(headerLabel, BorderLayout.NORTH);
+        // TITLE
+        JLabel title = new JLabel("", SwingConstants.CENTER);
+        title.setFont(new Font("Arial", Font.BOLD, 50));
+        add(title, BorderLayout.NORTH);
 
-        // 2. MIDDLE SECTION (Scrollable List)
-        roomListPanel = new JPanel();
-        roomListPanel.setLayout(new BoxLayout(roomListPanel, BoxLayout.Y_AXIS));
+        // CENTER PANEL (BUTTONS)
+        JPanel panel = new JPanel();
+        panel.setLayout(new GridBagLayout());
 
-        // JScrollPane allows the user to scroll if there are many rooms
-        JScrollPane scrollPane = new JScrollPane(roomListPanel);
-        add(scrollPane, BorderLayout.CENTER);
+        JPanel buttons = new JPanel();
+        buttons.setLayout(new GridLayout(4, 2, 20, 20));
 
-        // 3. LOAD THE DATA
-        displayAvailableRooms();
-    }
+        // GUEST SPECIFIC BUTTONS
+        JButton bookRoomBtn = new JButton("Book a Reservation");
+        JButton viewMyBookingsBtn = new JButton("My Bookings (View/Cancel)");
+        JButton availableRoomsBtn = new JButton("Check Room Availability");
+        JButton editProfileBtn = new JButton("Update Contact Info");
+        JButton logoutBtn = new JButton("Logout");
 
-    private void displayAvailableRooms() {
-        RoomDB roomDb = new RoomDB();
+        // FONT SETTINGS
+        Font btnFont = new Font("Arial", Font.BOLD, 20);
+        bookRoomBtn.setFont(btnFont);
+        viewMyBookingsBtn.setFont(btnFont);
+        availableRoomsBtn.setFont(btnFont);
+        editProfileBtn.setFont(btnFont);
+        logoutBtn.setFont(btnFont);
 
-        // Pull all rooms using your existing RoomDB method
-        ArrayList<Room> allRooms = roomDb.getAllRooms();
+        // Add to 4x2 grid
+        buttons.add(bookRoomBtn);
+        buttons.add(viewMyBookingsBtn);
+        buttons.add(availableRoomsBtn);
+        buttons.add(editProfileBtn);
+        buttons.add(logoutBtn);
 
-        // Loop through each room found in the database
-        for (Room r : allRooms) {
+        panel.add(buttons);
+        add(panel, BorderLayout.CENTER);
 
-            // Only show rooms that are actually 'Available'
-            if (r.getStatus().equalsIgnoreCase("Available")) {
+        // BUTTON ACTIONS
 
-                // Create a "Card" (a small panel) for each room
-                JPanel card = new JPanel(new GridLayout(4, 1, 5, 5));
-                card.setBorder(BorderFactory.createTitledBorder("Room Info"));
-                card.setMaximumSize(new Dimension(800, 200)); // Keeps cards from stretching too tall
+        // This opens the room management but as a Guest (so they can't edit rooms)
+        availableRoomsBtn.addActionListener(e -> new RoomManagementFrame("Guest").setVisible(true));
 
-                // Room Type & Price
-                JLabel typeLabel = new JLabel("Type: " + r.getType());
-                typeLabel.setFont(new Font("Arial", Font.BOLD, 18));
+        // This would be a new frame specifically for the logged-in user
+        viewMyBookingsBtn.addActionListener(e -> {
+            // new MyBookingsFrame(currentUsername).setVisible(true);
+        });
 
-                JLabel priceLabel = new JLabel("Price: ₱" + r.getPrice() + " per night");
+        logoutBtn.addActionListener(e -> {
+            dispose();
+            new LoginForm().setVisible(true);
+        });
 
-                // Amenities/Perks (This is the 'offers' part your prof wanted)
-                String perks = r.getAmenities();
-                JLabel perksLabel = new JLabel("Inclusions: " + (perks != null ? perks : "Standard Room Perks"));
-
-                // Booking Button
-                JButton btnBook = new JButton("Book " + r.getType() + " Now");
-
-                // Add everything to the card
-                card.add(typeLabel);
-                card.add(priceLabel);
-                card.add(perksLabel);
-                card.add(btnBook);
-
-                // Add the card to our main list panel
-                roomListPanel.add(card);
-
-                // Add a small invisible gap between cards so they don't touch
-                roomListPanel.add(Box.createRigidArea(new Dimension(0, 15)));
-            }
-        }
-
-        // Refresh the panel to show the newly added rooms
-        roomListPanel.revalidate();
-        roomListPanel.repaint();
+        setVisible(true);
     }
 }

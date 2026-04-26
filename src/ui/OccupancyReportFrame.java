@@ -15,7 +15,6 @@ public class OccupancyReportFrame extends JFrame {
         getContentPane().setBackground(Color.WHITE);
         setLayout(new BorderLayout(20, 20));
 
-        // Fetch Data from your existing RoomDB logic
         RoomDB roomDB = new RoomDB();
         Map<String, Integer> stats = roomDB.getOccupancyStats();
 
@@ -23,18 +22,15 @@ public class OccupancyReportFrame extends JFrame {
         int occupied = stats.getOrDefault("Occupied", 0);
         int maintenance = stats.getOrDefault("Maintenance", 0);
 
-        // --- TOP: HEADER ---
         JLabel header = new JLabel("Room Occupancy Overview", SwingConstants.CENTER);
         header.setFont(new Font("Arial", Font.BOLD, 24));
         header.setForeground(new Color(50, 50, 50));
         header.setBorder(BorderFactory.createEmptyBorder(20, 0, 10, 0));
         add(header, BorderLayout.NORTH);
 
-        // --- CENTER: DYNAMIC PIE CHART ---
         PieChartPanel chart = new PieChartPanel(available, occupied, maintenance);
         add(chart, BorderLayout.CENTER);
 
-        // --- BOTTOM: LEGEND ---
         JPanel footerPanel = new JPanel(new GridLayout(1, 3, 10, 10));
         footerPanel.setBackground(Color.WHITE);
         footerPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 30, 20));
@@ -46,7 +42,6 @@ public class OccupancyReportFrame extends JFrame {
         add(footerPanel, BorderLayout.SOUTH);
     }
 
-    // Helper method to create legend items with consistent styling
     private JPanel createLegendItem(String label, int count, Color color) {
         JPanel item = new JPanel(new BorderLayout());
         item.setBackground(Color.WHITE);
@@ -59,7 +54,6 @@ public class OccupancyReportFrame extends JFrame {
         return item;
     }
 
-    // --- CUSTOM PIE CHART PANEL WITH DYNAMIC CENTERING ---
     class PieChartPanel extends JPanel {
         private int avail, occ, maint;
 
@@ -75,7 +69,6 @@ public class OccupancyReportFrame extends JFrame {
             super.paintComponent(g);
             Graphics2D g2 = (Graphics2D) g;
 
-            // Enable Anti-Aliasing for smooth, professional curves
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
             int total = avail + occ + maint;
@@ -84,18 +77,15 @@ public class OccupancyReportFrame extends JFrame {
                 return;
             }
 
-            // DYNAMIC CENTERING: Calculate diameter and position based on current window size
             int diameter = Math.min(getWidth(), getHeight()) - 100;
             int x = (getWidth() - diameter) / 2;
             int y = (getHeight() - diameter) / 2;
 
-            // ARC MATH: Convert counts to degrees (360 total)
             int startAngle = 0;
             int arcAvail = (int) Math.round((double) avail / total * 360);
             int arcOcc = (int) Math.round((double) occ / total * 360);
             int arcMaint = 360 - arcAvail - arcOcc; // Remainder to ensure a perfect circle
 
-            // DRAW SEGMENTS
             g2.setColor(new Color(40, 167, 69)); // Available: Green
             g2.fillArc(x, y, diameter, diameter, startAngle, arcAvail);
 

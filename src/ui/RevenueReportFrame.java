@@ -60,11 +60,9 @@ public class RevenueReportFrame extends JFrame {
             int chartWidth = width - (2 * padding);
             int chartHeight = height - (2 * padding);
 
-            // Calculate max scale
             double maxRevenue = 0;
             for (double v : values) if (v > maxRevenue) maxRevenue = v;
 
-            // Handle empty state
             if (maxRevenue == 0) {
                 g2.setColor(Color.LIGHT_GRAY);
                 g2.setFont(new Font("Arial", Font.ITALIC, 18));
@@ -72,7 +70,6 @@ public class RevenueReportFrame extends JFrame {
                 maxRevenue = 1000;
             }
 
-            // Draw Background Grid Lines (Web Style)
             g2.setColor(new Color(230, 230, 230));
             for (int i = 0; i <= 5; i++) {
                 int lineY = height - padding - (i * chartHeight / 5);
@@ -90,11 +87,9 @@ public class RevenueReportFrame extends JFrame {
                 int x = padding + (i * (chartWidth / values.length)) + 25;
                 int y = height - padding - barHeight;
 
-                // Draw Bar
                 g2.setColor(new Color(0, 123, 255)); // Vibrant Web Blue
                 g2.fillRect(x, y, barWidth, barHeight);
 
-                // Draw Value Label on Top (Bold)
                 g2.setColor(Color.BLACK);
                 g2.setFont(new Font("Arial", Font.BOLD, 16));
                 String priceLabel = "₱" + String.format("%,.0f", values[i]);
@@ -102,7 +97,6 @@ public class RevenueReportFrame extends JFrame {
                 int labelX = x + (barWidth - fm.stringWidth(priceLabel)) / 2;
                 g2.drawString(priceLabel, labelX, y - 10);
 
-                // Draw Category Label at Bottom
                 g2.setFont(new Font("Arial", Font.PLAIN, 14));
                 int textX = x + (barWidth - fm.stringWidth(labels[i])) / 2;
                 g2.drawString(labels[i], textX, height - padding + 25);

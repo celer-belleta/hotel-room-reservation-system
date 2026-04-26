@@ -80,14 +80,14 @@ public class LoginForm extends JFrame {
         panel.add(signUpButton, gbc);
 
         // FORGOT PASSWORD
-        JLabel lblForgot = new JLabel("Forgot Password?", SwingConstants.CENTER);
+        JLabel lblForgot = new JLabel("Forgot Password?");
         lblForgot.setFont(new Font("Arial", Font.PLAIN, 16));
         lblForgot.setCursor(new Cursor(Cursor.HAND_CURSOR));
         gbc.gridy = 5;
         panel.add(lblForgot, gbc);
 
         // ERROR LABEL
-        errorLabel = new JLabel("", SwingConstants.CENTER);
+        errorLabel = new JLabel("");
         errorLabel.setFont(new Font("Arial", Font.PLAIN, 18));
         errorLabel.setForeground(Color.RED);
         gbc.gridy = 6;
@@ -136,6 +136,8 @@ public class LoginForm extends JFrame {
                     new AdminDashboard().setVisible(true);
                 } else if (role.equalsIgnoreCase("Clerk")) {
                     new ClerkDashboard().setVisible(true);
+                } else if (role.equalsIgnoreCase("Guest")) {
+                    new GuestDashboard(usernameField.getText()).setVisible(true);
                 }
 
             } else {
