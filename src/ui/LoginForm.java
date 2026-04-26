@@ -16,7 +16,7 @@ public class LoginForm extends JFrame {
 
     public LoginForm() {
 
-        setTitle("MAAYO HOTEL");
+        setTitle("LOGIN FORM");
         setExtendedState(JFrame.MAXIMIZED_BOTH);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
 
@@ -32,7 +32,7 @@ public class LoginForm extends JFrame {
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
         // TITLE
-        JLabel title = new JLabel("HOTEL LOGIN SYSTEM");
+        JLabel title = new JLabel("HOTEL LOGIN SYSTEM", SwingConstants.CENTER);
         title.setFont(new Font("Arial", Font.BOLD, 50));
         gbc.gridx = 0;
         gbc.gridy = 0;
@@ -73,17 +73,24 @@ public class LoginForm extends JFrame {
         gbc.gridwidth = 2;
         panel.add(loginButton, gbc);
 
-        // SIGN UP BUTTON (NEW)
+        // SIGN UP BUTTON
         JButton signUpButton = new JButton("SIGN UP");
         signUpButton.setFont(new Font("Arial", Font.BOLD, 22));
         gbc.gridy = 4;
         panel.add(signUpButton, gbc);
 
+        // FORGOT PASSWORD
+        JLabel lblForgot = new JLabel("Forgot Password?", SwingConstants.CENTER);
+        lblForgot.setFont(new Font("Arial", Font.PLAIN, 16));
+        lblForgot.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        gbc.gridy = 5;
+        panel.add(lblForgot, gbc);
+
         // ERROR LABEL
-        errorLabel = new JLabel("");
+        errorLabel = new JLabel("", SwingConstants.CENTER);
         errorLabel.setFont(new Font("Arial", Font.PLAIN, 18));
         errorLabel.setForeground(Color.RED);
-        gbc.gridy = 4;
+        gbc.gridy = 6;
         panel.add(errorLabel, gbc);
 
         add(panel);
@@ -92,6 +99,13 @@ public class LoginForm extends JFrame {
         loginButton.addActionListener(e -> login());
 
         signUpButton.addActionListener(e -> new SignUpFrame().setVisible(true));
+
+        lblForgot.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                // This opens your new reset window
+                new ForgotPasswordFrame().setVisible(true);
+            }
+        });
     }
 
     public void login() {

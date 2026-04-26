@@ -31,7 +31,7 @@ public class AddUserFrame extends JFrame {
         roleComboBox = new JComboBox<>(roles);
         add(roleComboBox);
 
-        JButton addBtn = new JButton("Add User");
+        JButton addBtn = new JButton("Confirm");
 
         // BUTTON ACTION
         addBtn.addActionListener(e -> addUser());

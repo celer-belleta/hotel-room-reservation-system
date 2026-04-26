@@ -168,16 +168,22 @@ public class UserDB {
     }
 
     // RESET PASSWORD
-    public boolean resetPasswordByUsername(String username, String newPassword) {
-        String sql = "UPDATE users SET password = ? WHERE username = ?";
+    public boolean resetPassword(String username, String contact, String newPassword) {
+        String sql = "UPDATE users " +
+                "JOIN guests ON users.id = guests.user_id " +
+                "SET users.password = ? " +
+                "WHERE users.username = ? AND guests.contact = ?";
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, newPassword);
             ps.setString(2, username);
+            ps.setString(3, contact);
 
-            return ps.executeUpdate() > 0;
+            int rowsUpdated = ps.executeUpdate();
+            return rowsUpdated > 0;
+
         } catch (SQLException e) {
             e.printStackTrace();
             return false;

@@ -39,7 +39,7 @@ public class AddRoomFrame extends JFrame {
         txtAmenities = new JTextField();
         add(txtAmenities);
 
-        JButton saveBtn = new JButton("SAVE ROOM");
+        JButton saveBtn = new JButton("CONFIRM");
         JButton cancelBtn = new JButton("CANCEL");
 
         add(saveBtn);

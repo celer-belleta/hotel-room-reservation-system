@@ -57,17 +57,38 @@ public class PaymentFrame extends JFrame {
     }
 
     private void handlePayment() {
+        JTextField promoField = new JTextField();
+        JCheckBox seniorCheckBox = new JCheckBox("Is Senior Citizen or PWD? (20% Off)");
+
+        Object[] discountPanel = {
+                "Enter Promo Code (Optional):", promoField,
+                seniorCheckBox
+        };
+
+        int option = JOptionPane.showConfirmDialog(this, discountPanel, "Discounts & Promos", JOptionPane.OK_CANCEL_OPTION);
+
+        double finalDiscount = 0;
+        if (option == JOptionPane.OK_OPTION) {
+            String promoCode = promoField.getText().trim();
+            boolean isSenior = seniorCheckBox.isSelected();
+
+            finalDiscount = payDB.calculateFinalDiscount(calculatedTotal, promoCode, isSenior);
+        }
+
+        double finalTotalToPay = calculatedTotal - finalDiscount;
         String method = (String) comboMethod.getSelectedItem();
         String type = (String) comboType.getSelectedItem();
         String invoice = "INV-" + (int)(Math.random() * 9999);
 
-        boolean success = payDB.processPayment(currentResId, calculatedTotal, method, type, invoice);
+        boolean success = payDB.processPayment(currentResId, finalTotalToPay, calculatedTotal, finalDiscount, method, type, invoice);
 
         if (success) {
             // Simulated Receipt Generation
             String receipt = "---------- HOTEL RECEIPT ----------\n" +
                     "Invoice: " + invoice + "\n" +
-                    "Total Paid: PHP " + calculatedTotal + "\n" +
+                    "Original Price: PHP " + calculatedTotal + "\n" +
+                    "Discount Applied: PHP " + finalDiscount + "\n" +
+                    "TOTAL PAID: PHP " + finalTotalToPay + "\n" +
                     "Method: " + method + "\n" +
                     "Type: " + type + "\n" +
                     "-----------------------------------";
