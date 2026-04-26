@@ -92,7 +92,7 @@ public class RoomDB {
         }
     }
 
-    // UPDATE STATUS
+    // UPDATE STATUS (Specifically for checking people in/out)
     public boolean updateRoomStatus(int id, String status) {
         String sql = "UPDATE rooms SET status=? WHERE id=?";
 
@@ -126,5 +126,29 @@ public class RoomDB {
             e.printStackTrace();
             return false;
         }
+    }
+
+    // GET OCCUPANCY STATS
+    public java.util.Map<String, Integer> getOccupancyStats() {
+        // This 'Map' is just a list of labels and their numbers
+        java.util.Map<String, Integer> stats = new java.util.HashMap<>();
+
+        // Ask the database: "Group rooms by status and count how many are in each"
+        String sql = "SELECT status, COUNT(*) as count FROM rooms GROUP BY status";
+
+        try (Connection conn = db.DBConnection.getConnection();
+             Statement st = conn.createStatement();
+             ResultSet rs = st.executeQuery(sql)) {
+
+            // Go through the results one by one
+            while (rs.next()) {
+                // Get the status name (like "Available") and the count (like 5)
+                // Then save them together in our 'stats' list
+                stats.put(rs.getString("status"), rs.getInt("count"));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return stats;
     }
 }

@@ -35,6 +35,7 @@ public class GuestManagementFrame extends JFrame {
         // BOTTOM PANEL (BUTTONS)
         JPanel buttonPanel = new JPanel();
         JButton registerBtn = new JButton("Register New Guest");
+        JButton editBtn = new JButton("Edit Guest");
         JButton deleteBtn = new JButton("Delete Guest");
 
         // SYMBOL REFRESH BUTTON
@@ -43,6 +44,7 @@ public class GuestManagementFrame extends JFrame {
         refreshBtn.setToolTipText("Refresh Table");
 
         buttonPanel.add(registerBtn);
+        buttonPanel.add(editBtn);
         buttonPanel.add(deleteBtn);
         buttonPanel.add(refreshBtn);
         add(buttonPanel, BorderLayout.SOUTH);
@@ -51,6 +53,40 @@ public class GuestManagementFrame extends JFrame {
         refreshBtn.addActionListener(e -> loadGuests());
 
         registerBtn.addActionListener(e -> new AddGuestFrame(this).setVisible(true));
+
+        editBtn.addActionListener(e -> {
+            int row = guestTable.getSelectedRow();
+            if (row == -1) {
+                JOptionPane.showMessageDialog(this, "Select a guest to edit!");
+                return;
+            }
+
+            int id = (int) tableModel.getValueAt(row, 0);
+            String name = (String) tableModel.getValueAt(row, 1);
+            String contact = (String) tableModel.getValueAt(row, 2);
+            String idNum = (String) tableModel.getValueAt(row, 3);
+
+            JTextField nameField = new JTextField(name);
+            JTextField contactField = new JTextField(contact);
+            JTextField idField = new JTextField(idNum);
+
+            Object[] message = {
+                    "Guest Name:", nameField,
+                    "Contact:", contactField,
+                    "ID Number:", idField
+            };
+
+            int option = JOptionPane.showConfirmDialog(this, message, "Edit Guest", JOptionPane.OK_CANCEL_OPTION);
+            if (option == JOptionPane.OK_OPTION) {
+                if (guestDB.updateGuest(id, nameField.getText(), contactField.getText(), idField.getText())) {
+
+                    tableModel.setValueAt(nameField.getText(), row, 1);
+                    tableModel.setValueAt(contactField.getText(), row, 2);
+                    tableModel.setValueAt(idField.getText(), row, 3);
+                    JOptionPane.showMessageDialog(this, "Guest updated!");
+                }
+            }
+        });
 
         deleteBtn.addActionListener(e -> {
             int row = guestTable.getSelectedRow();

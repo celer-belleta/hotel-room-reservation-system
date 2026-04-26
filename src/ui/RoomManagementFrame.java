@@ -14,7 +14,7 @@ public class RoomManagementFrame extends JFrame {
 
     private ArrayList<Room> roomList = new ArrayList<>();
 
-    public RoomManagementFrame() {
+    public RoomManagementFrame(String role) {
         roomDB = new RoomDB();
 
         setTitle("Room Management");
@@ -138,6 +138,13 @@ public class RoomManagementFrame extends JFrame {
                 }
             }
         });
+
+        // ROLE-BASED ACCESS
+        if (role.equalsIgnoreCase("Clerk")) {
+            addBtn.setVisible(false);
+            editBtn.setVisible(false);
+            deleteBtn.setVisible(false);
+        }
     }
 
     // LOAD ROOMS

@@ -123,4 +123,64 @@ public class UserDB {
             return false;
         }
     }
+
+    // REGISTER GUEST
+    public boolean registerGuest(String username, String password, String fullName, String contact) {
+
+        String userSql = "INSERT INTO users (username, password, role) VALUES (?, ?, 'Guest')";
+        String guestSql = "INSERT INTO guests (name, contact, user_id) VALUES (?, ?, ?)";
+
+        Connection conn = null;
+        try {
+            conn = DBConnection.getConnection();
+            conn.setAutoCommit(false); // Start transaction
+
+            // Insert into users table
+            PreparedStatement psUser = conn.prepareStatement(userSql, Statement.RETURN_GENERATED_KEYS);
+            psUser.setString(1, username);
+            psUser.setString(2, password);
+            psUser.executeUpdate();
+
+            // Get the ID of the user we just created
+            ResultSet rs = psUser.getGeneratedKeys();
+            int newUserId = 0;
+            if (rs.next()) {
+                newUserId = rs.getInt(1);
+            }
+
+            // Insert into guests table using that new ID
+            PreparedStatement psGuest = conn.prepareStatement(guestSql);
+            psGuest.setString(1, fullName);
+            psGuest.setString(2, contact);
+            psGuest.setInt(3, newUserId);
+            psGuest.executeUpdate();
+
+            conn.commit(); // Save both changes
+            return true;
+
+        } catch (SQLException e) {
+            try { if (conn != null) conn.rollback(); } catch (SQLException ex) {} // Undo changes on error
+            e.printStackTrace();
+            return false;
+        } finally {
+            try { if (conn != null) conn.setAutoCommit(true); } catch (SQLException ex) {}
+        }
+    }
+
+    // RESET PASSWORD
+    public boolean resetPasswordByUsername(String username, String newPassword) {
+        String sql = "UPDATE users SET password = ? WHERE username = ?";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, newPassword);
+            ps.setString(2, username);
+
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 }

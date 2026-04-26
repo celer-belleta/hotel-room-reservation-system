@@ -16,7 +16,7 @@ public class LoginForm extends JFrame {
 
     public LoginForm() {
 
-        setTitle("Hotel Login System");
+        setTitle("MAAYO HOTEL");
         setExtendedState(JFrame.MAXIMIZED_BOTH);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
 
@@ -73,6 +73,12 @@ public class LoginForm extends JFrame {
         gbc.gridwidth = 2;
         panel.add(loginButton, gbc);
 
+        // SIGN UP BUTTON (NEW)
+        JButton signUpButton = new JButton("SIGN UP");
+        signUpButton.setFont(new Font("Arial", Font.BOLD, 22));
+        gbc.gridy = 4;
+        panel.add(signUpButton, gbc);
+
         // ERROR LABEL
         errorLabel = new JLabel("");
         errorLabel.setFont(new Font("Arial", Font.PLAIN, 18));
@@ -84,6 +90,8 @@ public class LoginForm extends JFrame {
 
         // BUTTON ACTIONS
         loginButton.addActionListener(e -> login());
+
+        signUpButton.addActionListener(e -> new SignUpFrame().setVisible(true));
     }
 
     public void login() {

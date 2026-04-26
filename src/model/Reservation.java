@@ -9,14 +9,16 @@ public class Reservation {
     private Date checkIn;
     private Date checkOut;
     private String status;
+    private int packageId;
 
-    public Reservation(int resId, int guestId, int roomId, Date checkIn, Date checkOut, String status) {
+    public Reservation(int resId, int guestId, int roomId, Date checkIn, Date checkOut, String status, int packageId) {
         this.resId = resId;
         this.guestId = guestId;
         this.roomId = roomId;
         this.checkIn = checkIn;
         this.checkOut = checkOut;
         this.status = status;
+        this.packageId = packageId;
     }
 
     // Getters
@@ -26,6 +28,7 @@ public class Reservation {
     public Date getCheckIn() { return checkIn; }
     public Date getCheckOut() { return checkOut; }
     public String getStatus() { return status; }
+    public int getPackageId() { return packageId; }
 
     // Setters
     public void setResId(int resId) { this.resId = resId; }
@@ -34,4 +37,5 @@ public class Reservation {
     public void setCheckIn(Date checkIn) { this.checkIn = checkIn; }
     public void setCheckOut(Date checkOut) { this.checkOut = checkOut; }
     public void setStatus(String status) { this.status = status; }
+    public void setPackageId(int packageId) { this.packageId = packageId; }
 }

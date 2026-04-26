@@ -1,4 +1,4 @@
-HOTEL RESERVATION AND ROOM MANAGEMENT SYSTEM (module files list)
+HOTEL ROOM RESERVATION SYSTEM (module files list)
 
 1. User Management Module (DONE)
     Files: User.java, UserDB.java, LoginForm.java,
@@ -28,12 +28,14 @@ HOTEL RESERVATION AND ROOM MANAGEMENT SYSTEM (module files list)
     Notes: Implemented the Availability Check feature to prevent double-booking of rooms.
            Connects guests and the room together using their unique IDs.
 
-(Continuing tommorow finishing the Reservation Module where it will have edit and delete (CRUD)
-and guest management has edit guest too
 
 changes:
-  - only the reservation module uses the Setters
-    while others use refreshTable when updating the data.
 
-AN:
+needs changes:
+    - need to change the occupancy and revenue report.
+      (the frame right now is just to fill it up)
+    - sign up form for new users (guest)
+
+
+additional notes:
     - DAO folder is just the structure to hide the SQL code from the main application logic.

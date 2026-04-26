@@ -41,7 +41,7 @@ public class ClerkDashboard extends JFrame {
         // BUTTON ACTIONS
         registerGuestBtn.addActionListener(e -> new AddGuestFrame(this).setVisible(true));
 
-        viewRoomsBtn.addActionListener(e -> new RoomManagementFrame().setVisible(true));
+        viewRoomsBtn.addActionListener(e -> new RoomManagementFrame("Clerk").setVisible(true));
 
         resBtn.addActionListener(e -> new ReservationManagementFrame().setVisible(true));
 

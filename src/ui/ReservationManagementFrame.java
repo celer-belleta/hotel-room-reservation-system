@@ -1,6 +1,7 @@
 package ui;
 
 import dao.ReservationDB;
+import dao.PackageDB;
 import model.Reservation;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -11,7 +12,6 @@ public class ReservationManagementFrame extends JFrame {
     private JTable resTable;
     private DefaultTableModel tableModel;
     private ReservationDB resDB = new ReservationDB();
-
     private ArrayList<Reservation> reservationList = new ArrayList<>();
 
     public ReservationManagementFrame() {
@@ -20,82 +20,144 @@ public class ReservationManagementFrame extends JFrame {
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
 
-        // Table Setup
+        // Table setup
         String[] columns = {"ID", "Guest ID", "Room ID", "Check-In", "Check-Out", "Status"};
         tableModel = new DefaultTableModel(columns, 0);
         resTable = new JTable(tableModel);
         add(new JScrollPane(resTable), BorderLayout.CENTER);
 
-        // Button Panel
+        // Buttons
         JPanel btnPanel = new JPanel();
         JButton btnAdd = new JButton("New Booking");
+        JButton editBtn = new JButton("Edit Dates");
+        JButton btnProcessPayment = new JButton("Process Payment");
         JButton btnCancel = new JButton("Cancel Reservation");
+        JButton deleteBtn = new JButton("Delete Reservation");
 
         JButton refreshBtn = new JButton("\u21BB");
         refreshBtn.setFont(new Font("Segoe UI Symbol", Font.BOLD, 18));
-        refreshBtn.setToolTipText("Refresh Table");
 
         btnPanel.add(btnAdd);
+        btnPanel.add(editBtn);
+        btnPanel.add(btnProcessPayment);
         btnPanel.add(btnCancel);
+        btnPanel.add(deleteBtn);
         btnPanel.add(refreshBtn);
         add(btnPanel, BorderLayout.SOUTH);
+
 
         // BUTTON ACTIONS
         btnAdd.addActionListener(e -> new AddReservationFrame(this).setVisible(true));
 
+        editBtn.addActionListener(e -> {
+            int row = resTable.getSelectedRow();
+            if (row == -1) {
+                JOptionPane.showMessageDialog(this, "Please select a reservation to edit!");
+                return;
+            }
+
+            int resId = (int) tableModel.getValueAt(row, 0);
+            String currentIn = tableModel.getValueAt(row, 3).toString();
+            String currentOut = tableModel.getValueAt(row, 4).toString();
+
+            JTextField txtIn = new JTextField(currentIn);
+            JTextField txtOut = new JTextField(currentOut);
+            Object[] message = {"Check-in:", txtIn, "Check-out:", txtOut};
+
+            if (JOptionPane.showConfirmDialog(this, message, "Edit", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+                try {
+                    java.sql.Date sqlIn = java.sql.Date.valueOf(txtIn.getText());
+                    java.sql.Date sqlOut = java.sql.Date.valueOf(txtOut.getText());
+                    if (resDB.updateReservation(resId, sqlIn, sqlOut)) {
+                        refreshTable();
+                        JOptionPane.showMessageDialog(this, "Updated!");
+                    }
+                } catch (Exception ex) { JOptionPane.showMessageDialog(this, "Format: YYYY-MM-DD"); }
+            }
+        });
+
+        btnProcessPayment.addActionListener(e -> {
+            int row = resTable.getSelectedRow();
+            if (row == -1) {
+                JOptionPane.showMessageDialog(this, "Select a reservation!");
+                return;
+            }
+
+            int resId = (int) tableModel.getValueAt(row, 0);
+            int gId = (int) tableModel.getValueAt(row, 1);
+            int rId = (int) tableModel.getValueAt(row, 2);
+            java.sql.Date start = (java.sql.Date) tableModel.getValueAt(row, 3);
+            java.sql.Date end = (java.sql.Date) tableModel.getValueAt(row, 4);
+
+            // Get package info from the reservation
+            Reservation selectedRes = reservationList.get(row);
+            int pkgId = selectedRes.getPackageId();
+
+            PackageDB pkgDB = new PackageDB();
+            String pkgName = pkgDB.getPackageName(pkgId);
+            double pkgPrice = pkgDB.getPackagePrice(pkgId);
+
+            new PaymentFrame(resId, "Guest #" + gId, "Room #" + rId, pkgPrice, start, end, pkgName).setVisible(true);
+        });
+
         btnCancel.addActionListener(e -> {
             int row = resTable.getSelectedRow();
 
-            if (row != -1) {
-                int id = (int) tableModel.getValueAt(row, 0);
+            if (row == -1) {
+                JOptionPane.showMessageDialog(this, "Please select a reservation to cancel!");
+                return;
+            }
 
-                int confirm = JOptionPane.showConfirmDialog(
-                        this,
-                        "Are you sure you want to cancel reservation ID: " + id + "?",
-                        "Confirm Cancellation",
-                        JOptionPane.YES_NO_OPTION,
-                        JOptionPane.WARNING_MESSAGE
-                );
+            int id = (int) tableModel.getValueAt(row, 0);
 
-                if (confirm == JOptionPane.YES_OPTION) {
-                    if (resDB.cancelReservation(id)) {
+            int roomId = (int) tableModel.getValueAt(row, 2);
 
-                        Reservation res = reservationList.get(row);
-                        res.setStatus("Cancelled");
+            if (resDB.cancelReservation(id, roomId)) {
+                refreshTable();
+                JOptionPane.showMessageDialog(this, "Reservation #" + id + " has been cancelled.");
+            }
+        });
 
-                        tableModel.setValueAt("Cancelled", row, 5);
+        deleteBtn.addActionListener(e -> {
+            int row = resTable.getSelectedRow();
 
-                        JOptionPane.showMessageDialog(this, "Reservation cancelled successfully.");
+            if (row == -1) {
+                JOptionPane.showMessageDialog(this, "Please select a reservation to delete!");
+                return;
+            }
 
-                    } else {
-                        JOptionPane.showMessageDialog(this, "Error updating database.");
-                    }
+            int id = (int) tableModel.getValueAt(row, 0);
+            int confirm = JOptionPane.showConfirmDialog(this, "Permanently delete Reservation #" + id + "?", "Confirm", JOptionPane.YES_NO_OPTION);
+
+            if (confirm == JOptionPane.YES_OPTION) {
+                if (resDB.deleteReservation(id)) {
+                    refreshTable();
+                    JOptionPane.showMessageDialog(this, "Record deleted successfully.");
                 }
-            } else {
-                JOptionPane.showMessageDialog(this, "Please select a reservation to cancel.");
             }
         });
 
         refreshBtn.addActionListener(e -> refreshTable());
-
         refreshTable();
     }
 
     public void refreshTable() {
-        tableModel.setRowCount(0);
+        try {
+            tableModel.setRowCount(0);
+            reservationList = resDB.getAllReservations();
 
-        reservationList = resDB.getAllReservations();
+            for (Reservation res : reservationList) {
+                tableModel.addRow(new Object[]{
+                        res.getResId(), res.getGuestId(), res.getRoomId(),
+                        res.getCheckIn(), res.getCheckOut(), res.getStatus()
+                });
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this,
+                    "Database Error: Could not load reservations.\n" + e.getMessage(),
+                    "System Error", JOptionPane.ERROR_MESSAGE);
 
-        for (Reservation res : reservationList) {
-            Object[] rowData = {
-                    res.getResId(),
-                    res.getGuestId(),
-                    res.getRoomId(),
-                    res.getCheckIn(),
-                    res.getCheckOut(),
-                    res.getStatus()
-            };
-            tableModel.addRow(rowData);
+            e.printStackTrace();
         }
     }
 }
