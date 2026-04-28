@@ -65,7 +65,7 @@ public class GuestDashboard extends JFrame {
 
         logoutBtn.addActionListener(e -> {
             dispose();
-            new LoginForm().setVisible(true);
+            new MainFrame().setVisible(true);
         });
 
         setVisible(true);

@@ -47,7 +47,7 @@ public class ClerkDashboard extends JFrame {
 
         logoutBtn.addActionListener(e -> {
             dispose();
-            new LoginForm().setVisible(true);
+            new MainFrame().setVisible(true);
         });
     }
 }

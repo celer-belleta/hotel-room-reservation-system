@@ -68,13 +68,13 @@ public class AdminDashboard extends JFrame {
 
         resBtn.addActionListener(e -> new ReservationManagementFrame().setVisible(true));
 
-        occupancyBtn.addActionListener(e -> new OccupancyReportFrame().setVisible(true));
+        // occupancyBtn.addActionListener(e -> new OccupancyReportFrame().setVisible(true));
 
-        revenueBtn.addActionListener(e -> new RevenueReportFrame().setVisible(true));
+        //revenueBtn.addActionListener(e -> new RevenueReportFrame().setVisible(true));
 
         logoutBtn.addActionListener(e -> {
             dispose();
-            new LoginForm().setVisible(true);
+            new MainFrame().setVisible(true);
         });
 
         setVisible(true);

@@ -51,7 +51,7 @@ CREATE TABLE reservations (
     status ENUM('Pending', 'Confirmed', 'Cancelled') DEFAULT 'Confirmed',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
-    -- Links to ensure you can't book for a ghost guest or non-existent room
+    -- Foreign key constraints
     FOREIGN KEY (guest_id) REFERENCES guests(guest_id),
     FOREIGN KEY (room_id) REFERENCES rooms(id),
     FOREIGN KEY (package_id) REFERENCES packages(package_id)

@@ -1,11 +1,9 @@
 package ui;
 
-import db.DBConnection;
-
 public class Main {
     public static void main(String[] args){
 
-        new LoginForm().setVisible(true);
+        new MainFrame().setVisible(true);
 
     } // main
 } // class
