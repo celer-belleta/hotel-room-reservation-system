@@ -11,7 +11,10 @@ public class AddUserFrame extends JFrame {
     private JTextField passwordField;
     private JComboBox<String> roleComboBox;
 
-    public AddUserFrame(UserTableFrame parent) {
+    private UserTablePanel parentPanel;
+
+    public AddUserFrame(UserTablePanel parent) {
+        this.parentPanel = parent;
 
         setTitle("Add User");
         setSize(400, 300);
@@ -57,7 +60,10 @@ public class AddUserFrame extends JFrame {
 
         if (success) {
             JOptionPane.showMessageDialog(this, "User added successfully!");
-            dispose(); // Closes the window
+            if (parentPanel != null) {
+                parentPanel.loadUsers();
+            }
+            dispose();
         }
     }
 }

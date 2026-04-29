@@ -2,8 +2,13 @@ package ui;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class AdminDashboard extends JFrame {
+
+    private JPanel mainContent;
+    private CardLayout cardLayout;
 
     public AdminDashboard() {
 
@@ -12,109 +17,84 @@ public class AdminDashboard extends JFrame {
         setExtendedState(JFrame.MAXIMIZED_BOTH);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
+        getContentPane().setBackground(Color.WHITE);
 
-        // TITLE
-        JLabel title = new JLabel("OPERATIONS MANAGEMENT", SwingConstants.CENTER);
-        title.setFont(new Font("Arial", Font.BOLD, 50));
+        JPanel sidebar = new JPanel();
+        sidebar.setLayout(new BoxLayout(sidebar, BoxLayout.Y_AXIS));
+        sidebar.setBackground(Color.WHITE);
+        sidebar.setPreferredSize(new Dimension(250, 0));
+        sidebar.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, Color.BLACK));
 
-        add(title, BorderLayout.NORTH);
+        sidebar.add(Box.createRigidArea(new Dimension(0, 150)));
 
-        // CENTER PANEL (BUTTONS)
-        JPanel panel = new JPanel();
-        panel.setLayout(new GridBagLayout());
+        addSidebarNav(sidebar, "USERS", "USERS_PAGE");
+        addSidebarNav(sidebar, "GUESTS", "GUESTS_PAGE");
+        addSidebarNav(sidebar, "ROOMS", "ROOMS_PAGE");
+        addSidebarNav(sidebar, "RESERVATIONS", "RESERVATIONS_PAGE");
+        addSidebarNav(sidebar, "REPORTS", "REPORTS_PAGE");
 
-        JPanel buttons = new JPanel();
-        buttons.setLayout(new GridLayout(4, 2, 20, 20));
+        sidebar.add(Box.createVerticalGlue());
+        addSidebarNav(sidebar, "LOGOUT", "LOGOUT_ACTION");
+        sidebar.add(Box.createRigidArea(new Dimension(0, 30)));
 
-        JButton viewUsersBtn = new JButton("View Users");
-        JButton addUserBtn = new JButton("Add User");
-        JButton viewRoomsBtn = new JButton("Manage Rooms");
-        JButton viewGuestsBtn = new JButton("Manage Guests");
-        JButton resBtn = new JButton("Manage Reservations");
-        JButton occupancyBtn = new JButton("Occupancy Report");
-        JButton revenueBtn = new JButton("Revenue Report");
-        JButton logoutBtn = new JButton("Logout");
+        add(sidebar, BorderLayout.WEST);
 
-        viewUsersBtn.setFont(new Font("Arial", Font.BOLD, 20));
-        addUserBtn.setFont(new Font("Arial", Font.BOLD, 20));
-        viewRoomsBtn.setFont(new Font("Arial", Font.BOLD, 20));
-        viewGuestsBtn.setFont(new Font("Arial", Font.BOLD, 20));
-        resBtn.setFont(new Font("Arial", Font.BOLD, 20));
-        occupancyBtn.setFont(new Font("Arial", Font.BOLD, 20));
-        revenueBtn.setFont(new Font("Arial", Font.BOLD, 20));
-        logoutBtn.setFont(new Font("Arial", Font.BOLD, 20));
+        JPanel centerWrapper = new JPanel(new BorderLayout());
+        centerWrapper.setBackground(Color.WHITE);
 
-        // 4 rows, 2 columns each
-        buttons.add(viewUsersBtn);
-        buttons.add(addUserBtn);
-        buttons.add(viewRoomsBtn);
-        buttons.add(viewGuestsBtn);
-        buttons.add(resBtn);
-        buttons.add(occupancyBtn);
-        buttons.add(revenueBtn);
-        buttons.add(logoutBtn);
+        JLabel lblHotelName = new JLabel("HOTEL NAME", SwingConstants.CENTER);
+        lblHotelName.setFont(new Font("Arial", Font.BOLD, 50));
+        lblHotelName.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
+        centerWrapper.add(lblHotelName, BorderLayout.NORTH);
 
-        panel.add(buttons);
-        add(panel, BorderLayout.CENTER);
+        // CardLayout Area
+        cardLayout = new CardLayout();
+        mainContent = new JPanel(cardLayout);
+        mainContent.setBackground(Color.WHITE);
 
-        // BUTTON ACTIONS
-        viewUsersBtn.addActionListener(e -> new UserTableFrame());
+        // for separate panels
+        mainContent.add(new UserTablePanel(), "USERS_PAGE");
+        mainContent.add(new GuestTablePanel(), "GUESTS_PAGE");
 
-        addUserBtn.addActionListener(e -> new AddUserFrame(null).setVisible(true));
+        // Placeholder panels for other sections
+        mainContent.add(new JPanel(), "ROOMS_PAGE");
 
-        viewRoomsBtn.addActionListener(e -> new RoomManagementFrame("Admin").setVisible(true));
-
-        viewGuestsBtn.addActionListener(e -> new GuestManagementFrame().setVisible(true));
-
-        resBtn.addActionListener(e -> new ReservationManagementFrame().setVisible(true));
-
-        // occupancyBtn.addActionListener(e -> new OccupancyReportFrame().setVisible(true));
-
-        //revenueBtn.addActionListener(e -> new RevenueReportFrame().setVisible(true));
-
-        logoutBtn.addActionListener(e -> {
-            dispose();
-            new MainFrame().setVisible(true);
-        });
+        centerWrapper.add(mainContent, BorderLayout.CENTER);
+        add(centerWrapper, BorderLayout.CENTER);
 
         setVisible(true);
     }
 
-    /*
+    private void addSidebarNav(JPanel container, String text, String cardName) {
+        JLabel navLabel = new JLabel(text);
+        navLabel.setFont(new Font("Arial", Font.BOLD, 18));
+        navLabel.setBorder(BorderFactory.createEmptyBorder(15, 40, 15, 0));
+        navLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        navLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-    // NOTIFICATION PANEL
-    private JPanel createNotificationPanel() {
-        JPanel panel = new JPanel();
-        // Layout: Stack items vertically
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-        panel.setBorder(BorderFactory.createTitledBorder("Today's Alerts & Notifications"));
-        panel.setBackground(new Color(255, 250, 240)); // A light cream color so it stands out
-
-        dao.AlertDB alertDB = new dao.AlertDB();
-
-        // Combine our two alert types into one list
-        java.util.List<String> allAlerts = new java.util.ArrayList<>();
-        allAlerts.addAll(alertDB.getCheckOutAlerts());
-        allAlerts.addAll(alertDB.getMaintenanceAlerts());
-
-        if (allAlerts.isEmpty()) {
-            JLabel clear = new JLabel("  ✅ All clear! No urgent alerts for today.");
-            clear.setFont(new Font("Arial", Font.ITALIC, 14));
-            panel.add(clear);
-        } else {
-            for (String msg : allAlerts) {
-                JLabel label = new JLabel("  • " + msg);
-                label.setFont(new Font("Arial", Font.PLAIN, 15));
-                label.setForeground(new Color(180, 0, 0)); // Red for urgency
-                panel.add(label);
-                panel.add(Box.createRigidArea(new Dimension(0, 5))); // Add small gap between alerts
+        navLabel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (cardName.equals("LOGOUT_ACTION")) {
+                    dispose(); //
+                    new MainFrame().setVisible(true);
+                } else {
+                    cardLayout.show(mainContent, cardName);
+                }
             }
-        }
-        return panel;
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                navLabel.setForeground(new Color(197, 160, 89)); // Maayo Gold
+            }
+            @Override
+            public void mouseExited(MouseEvent e) {
+                navLabel.setForeground(Color.BLACK);
+            }
+        });
+        container.add(navLabel);
     }
 
-
-    // ADD THE NOTIFICATION PANEL TO THE RIGHT SIDE
-    add(createNotificationPanel(), BorderLayout.EAST);
-     */
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> new AdminDashboard());
+    }
 }

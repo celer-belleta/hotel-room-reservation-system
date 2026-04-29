@@ -41,6 +41,7 @@ public class MainFrame extends JFrame {
 
         add(mainContent, BorderLayout.CENTER);
 
+        // BUTTON ACTIONS
         btnAbout.addActionListener(e -> cardLayout.show(mainContent, "ABOUT_PAGE"));
         btnRooms.addActionListener(e -> cardLayout.show(mainContent, "ROOMS_PAGE"));
         btnLogin.addActionListener(e -> cardLayout.show(mainContent, "LOGIN_PAGE"));

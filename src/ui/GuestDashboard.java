@@ -11,7 +11,7 @@ public class GuestDashboard extends JFrame {
         this.currentUsername = username;
 
         // FRAME SETTINGS
-        setTitle("Guest Dashboard" + username);
+        setTitle("Guest Dashboard");
         setExtendedState(JFrame.MAXIMIZED_BOTH);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
@@ -43,7 +43,6 @@ public class GuestDashboard extends JFrame {
         editProfileBtn.setFont(btnFont);
         logoutBtn.setFont(btnFont);
 
-        // Add to 4x2 grid
         buttons.add(bookRoomBtn);
         buttons.add(viewMyBookingsBtn);
         buttons.add(availableRoomsBtn);
@@ -56,7 +55,8 @@ public class GuestDashboard extends JFrame {
         // BUTTON ACTIONS
 
         // This opens the room management but as a Guest (so they can't edit rooms)
-        availableRoomsBtn.addActionListener(e -> new RoomManagementFrame("Guest").setVisible(true));
+
+        //availableRoomsBtn.addActionListener(e -> new RoomManagementFrame("Guest").setVisible(true));
 
         // This would be a new frame specifically for the logged-in user
         viewMyBookingsBtn.addActionListener(e -> {

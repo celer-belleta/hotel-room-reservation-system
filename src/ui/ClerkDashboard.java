@@ -11,11 +11,6 @@ public class ClerkDashboard extends JFrame {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
-        // TITLE
-        JLabel title = new JLabel("RECEPTION MANAGEMENT", SwingConstants.CENTER);
-        title.setFont(new Font("Arial", Font.BOLD, 50));
-        add(title, BorderLayout.NORTH);
-
         // BUTTON PANEL
         JPanel panel = new JPanel(new GridBagLayout());
         JPanel buttons = new JPanel(new GridLayout(3, 2, 20, 20));
@@ -39,7 +34,7 @@ public class ClerkDashboard extends JFrame {
         add(panel, BorderLayout.CENTER);
 
         // BUTTON ACTIONS
-        registerGuestBtn.addActionListener(e -> new AddGuestFrame(this).setVisible(true));
+        //registerGuestBtn.addActionListener(e -> new AddGuestFrame(this).setVisible(true));
 
         viewRoomsBtn.addActionListener(e -> new RoomManagementFrame("Clerk").setVisible(true));
 

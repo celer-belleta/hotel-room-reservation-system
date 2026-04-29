@@ -8,9 +8,9 @@ public class AddGuestFrame extends JFrame {
 
     private JTextField txtName, txtContact, txtIdNumber;
     private GuestDB guestDB;
-    private JFrame parent;
+    private GuestTablePanel parent;
 
-    public AddGuestFrame(JFrame parent) {
+    public AddGuestFrame(GuestTablePanel parent) {
         this.parent = parent;
         guestDB = new GuestDB();
 
@@ -51,16 +51,25 @@ public class AddGuestFrame extends JFrame {
                 return;
             }
 
-            if (guestDB.addGuest(name, contact, idNum)) {
-                JOptionPane.showMessageDialog(this, "Guest Registered Successfully!");
+            // username and password generation
+            String cleanName = name.toLowerCase().replace(" ", "");
 
-                if (parent instanceof GuestManagementFrame) {
-                    ((GuestManagementFrame) parent).loadGuests();
+            String generatedUser = cleanName;
+
+            String generatedPass = cleanName + "123";
+
+            if (guestDB.addGuest(name, contact, idNum, generatedUser, generatedPass)) {
+                JOptionPane.showMessageDialog(this,
+                        "Guest Registered!\n" +
+                                "Username: " + generatedUser + "\n" +
+                                "Temp Password: " + generatedPass);
+
+                if (parent != null) {
+                    parent.loadGuests();
                 }
-
                 dispose();
             } else {
-                JOptionPane.showMessageDialog(this, "Error: Could not register guest to database.", "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Error: Could not register guest.");
             }
         });
 

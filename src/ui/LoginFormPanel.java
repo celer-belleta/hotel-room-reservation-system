@@ -137,27 +137,44 @@ public class LoginFormPanel extends JPanel {
                 return;
             }
 
-            String sql = "SELECT role FROM users WHERE username=? AND password=?";
-            PreparedStatement ps = conn.prepareStatement(sql);
-            ps.setString(1, txtUsername.getText());
-            ps.setString(2, new String(txtPassword.getPassword()));
+            String user = txtUsername.getText();
+            String pass = new String(txtPassword.getPassword());
 
-            ResultSet rs = ps.executeQuery();
+            // Try Staff Login (Admins/Clerks)
+            String staffSql = "SELECT role FROM users WHERE username=? AND password=?";
+            try (PreparedStatement ps = conn.prepareStatement(staffSql)) {
+                ps.setString(1, user);
+                ps.setString(2, pass);
+                ResultSet rs = ps.executeQuery();
 
-            if (rs.next()) {
-                String role = rs.getString("role");
-                parentFrame.dispose();
+                if (rs.next()) {
+                    String role = rs.getString("role");
+                    parentFrame.dispose();
 
-                if (role.equalsIgnoreCase("Admin")) {
-                    new AdminDashboard().setVisible(true);
-                } else if (role.equalsIgnoreCase("Clerk")) {
-                    new ClerkDashboard().setVisible(true);
-                } else if (role.equalsIgnoreCase("Guest")) {
-                    new GuestDashboard(txtUsername.getText()).setVisible(true);
+                    if (role.equalsIgnoreCase("Admin")) {
+                        new AdminDashboard().setVisible(true);
+                    } else if (role.equalsIgnoreCase("Clerk")) {
+                        new ClerkDashboard().setVisible(true);
+                    }
+                    return; // Exit if staff found
                 }
-            } else {
-                lblError.setText("Invalid username or password");
             }
+
+            // Try Guest Login (If no staff found)
+            String guestSql = "SELECT name FROM guests WHERE username=? AND password=?";
+            try (PreparedStatement ps = conn.prepareStatement(guestSql)) {
+                ps.setString(1, user);
+                ps.setString(2, pass);
+                ResultSet rs = ps.executeQuery();
+
+                if (rs.next()) {
+                    parentFrame.dispose();
+                    new GuestDashboard(user).setVisible(true);
+                } else {
+                    lblError.setText("Invalid username or password");
+                }
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
             lblError.setText("Error occurred");

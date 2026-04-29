@@ -23,7 +23,9 @@ CREATE TABLE guests (
     guest_id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     contact VARCHAR(50),
-    id_number VARCHAR(50)
+    id_number VARCHAR(50),
+    username VARCHAR(50) UNIQUE NOT NULL, -- Added for login
+    password VARCHAR(50) NOT NULL         -- Added for login
 );
 
 -- Packages table
@@ -72,3 +74,6 @@ CREATE TABLE payments (
 added:
     ALTER TABLE guests ADD COLUMN user_id INT;
     ALTER TABLE guests ADD FOREIGN KEY (user_id) REFERENCES users(id);
+
+changes:
+    -- remove the user_id column from guests table
