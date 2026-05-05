@@ -5,44 +5,51 @@ import java.awt.*;
 
 public class ClerkDashboard extends JFrame {
 
+    private JPanel mainContent;
+    private CardLayout cardLayout;
+
     public ClerkDashboard() {
-        setTitle("Clerk Dashboard");
+        setTitle("Guest Dashboard - Aurelia Grand Hotel");
         setExtendedState(JFrame.MAXIMIZED_BOTH);
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
+        getContentPane().setBackground(Color.WHITE);
 
-        // BUTTON PANEL
-        JPanel panel = new JPanel(new GridBagLayout());
-        JPanel buttons = new JPanel(new GridLayout(3, 2, 20, 20));
+        ClerkSidebar sidebar = new ClerkSidebar(this);
+        add(sidebar, BorderLayout.WEST);
 
-        JButton registerGuestBtn = new JButton("Register New Guest");
-        JButton viewRoomsBtn = new JButton("Check Room Availability");
-        JButton resBtn = new JButton("Manage Reservations");
-        JButton logoutBtn = new JButton("Logout");
+        JPanel rightContainer = new JPanel(new BorderLayout());
+        rightContainer.setBackground(Color.WHITE);
 
-        registerGuestBtn.setFont(new Font("Arial", Font.BOLD, 20));
-        viewRoomsBtn.setFont(new Font("Arial", Font.BOLD, 20));
-        resBtn.setFont(new Font("Arial", Font.BOLD, 20));
-        logoutBtn.setFont(new Font("Arial", Font.BOLD, 20));
+        JLabel lblHotelName = new JLabel("AURELIA GRAND HOTEL", SwingConstants.CENTER);
+        lblHotelName.setFont(new Font("Arial", Font.BOLD, 50));
+        lblHotelName.setBorder(BorderFactory.createEmptyBorder(40, 0, 20, 0));
+        rightContainer.add(lblHotelName, BorderLayout.NORTH);
 
-        buttons.add(registerGuestBtn);
-        buttons.add(viewRoomsBtn);
-        buttons.add(resBtn);
-        buttons.add(logoutBtn);
+        cardLayout = new CardLayout();
+        mainContent = new JPanel(cardLayout);
+        mainContent.setBackground(Color.WHITE);
 
-        panel.add(buttons);
-        add(panel, BorderLayout.CENTER);
+        mainContent.add(new AdminSummaryPanel(), "DASHBOARD");
+        mainContent.add(new GuestTablePanel(), "GUEST_LIST");
+        mainContent.add(new RoomTablePanel("Clerk"), "ROOM_LIST");
+        mainContent.add(new ReservationTablePanel(), "RESERVATIONS");
 
-        // BUTTON ACTIONS
-        //registerGuestBtn.addActionListener(e -> new AddGuestFrame(this).setVisible(true));
+        rightContainer.add(mainContent, BorderLayout.CENTER);
+        add(rightContainer, BorderLayout.CENTER);
 
-        viewRoomsBtn.addActionListener(e -> new RoomManagementFrame("Clerk").setVisible(true));
+        cardLayout.show(mainContent, "DASHBOARD");
+        setVisible(true);
+    }
 
-        resBtn.addActionListener(e -> new ReservationManagementFrame().setVisible(true));
-
-        logoutBtn.addActionListener(e -> {
+    public void showPage(String cardName) {
+        if (cardName.equals("LOGOUT")) {
             dispose();
             new MainFrame().setVisible(true);
-        });
+        } else {
+            cardLayout.show(mainContent, cardName);
+        }
     }
+
+    public static void main(String[] args) { SwingUtilities.invokeLater(() -> new ClerkDashboard()); }
 }

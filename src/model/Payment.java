@@ -10,12 +10,11 @@ public class Payment {
     private String paymentMethod; // Cash or Card
     private String paymentType;   // Down Payment or Full Payment
     private String invoiceNumber;
-
-    //private double totalAmountDue;
-    //private double discountAmount;
+    private double totalAmountDue;
+    private double discountAmount;
 
     public Payment(int paymentId, int resId, double amountPaid, Timestamp paymentDate,
-                   String paymentMethod, String paymentType, String invoiceNumber) {
+                   String paymentMethod, String paymentType, String invoiceNumber, double totalAmountDue, double discountAmount) {
         this.paymentId = paymentId;
         this.resId = resId;
         this.amountPaid = amountPaid;
@@ -23,6 +22,8 @@ public class Payment {
         this.paymentMethod = paymentMethod;
         this.paymentType = paymentType;
         this.invoiceNumber = invoiceNumber;
+        this.totalAmountDue = totalAmountDue;
+        this.discountAmount = discountAmount;
     }
 
     // Getters
@@ -33,4 +34,6 @@ public class Payment {
     public String getPaymentMethod() { return paymentMethod; }
     public String getPaymentType() { return paymentType; }
     public String getInvoiceNumber() { return invoiceNumber; }
+    public double getTotalAmountDue() { return totalAmountDue; }
+    public double getDiscountAmount() { return discountAmount; }
 }

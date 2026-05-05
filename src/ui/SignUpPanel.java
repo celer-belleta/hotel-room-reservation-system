@@ -5,7 +5,10 @@ import javax.swing.*;
 import java.awt.*;
 
 public class SignUpPanel extends JPanel {
-    private JTextField txtName = new JTextField(20);
+    private JTextField txtFirstName = new JTextField(20);
+    private JTextField txtLastName = new JTextField(20);
+    private JComboBox<String> comboIdType = new JComboBox<>(new String[]{"Passport", "Drivers License", "National ID", "Student ID"});
+
     private JTextField txtUsername = new JTextField(20);
     private JPasswordField txtPassword = new JPasswordField(20);
     private JTextField txtContact = new JTextField(20);
@@ -38,14 +41,16 @@ public class SignUpPanel extends JPanel {
         wrapGbc.insets = new Insets(5, 15, 5, 15);
         wrapGbc.gridwidth = 1;
 
-        addLabelAndField("Full Name:", txtName, 1, wrapGbc, contentWrap);
-        addLabelAndField("Username:", txtUsername, 2, wrapGbc, contentWrap);
-        addLabelAndField("Password:", txtPassword, 3, wrapGbc, contentWrap);
-        addLabelAndField("Contact:", txtContact, 4, wrapGbc, contentWrap);
-        addLabelAndField("ID Number:", txtIdNum, 5, wrapGbc, contentWrap); // ADDED FIELD
+        addLabelAndField("First Name:", txtFirstName, 1, wrapGbc, contentWrap);
+        addLabelAndField("Last Name:", txtLastName, 2, wrapGbc, contentWrap);
+        addLabelAndField("Contact:", txtContact, 3, wrapGbc, contentWrap);
+        addLabelAndField("ID Type:", comboIdType, 4, wrapGbc, contentWrap);
+        addLabelAndField("ID Number:", txtIdNum, 5, wrapGbc, contentWrap);
+        addLabelAndField("Username:", txtUsername, 6, wrapGbc, contentWrap);
+        addLabelAndField("Password:", txtPassword, 7, wrapGbc, contentWrap);
 
         // SUBMIT BUTTON
-        wrapGbc.gridy = 6;
+        wrapGbc.gridy = 8;
         wrapGbc.gridx = 0;
         wrapGbc.gridwidth = 2;
         wrapGbc.anchor = GridBagConstraints.CENTER;
@@ -59,7 +64,7 @@ public class SignUpPanel extends JPanel {
         JLabel lblBack = new JLabel("Already have an account? Login here", SwingConstants.CENTER);
         lblBack.setFont(new Font("Arial", Font.PLAIN, 14));
         lblBack.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        wrapGbc.gridy = 7;
+        wrapGbc.gridy = 9;
         wrapGbc.gridx = 0;
         wrapGbc.gridwidth = 2;
         wrapGbc.insets = new Insets(5, 15, 20, 15);
@@ -69,25 +74,27 @@ public class SignUpPanel extends JPanel {
 
         // BUTTON ACTIONS
         btnSubmit.addActionListener(e -> {
-            String name = txtName.getText().trim();
+            String fName = txtFirstName.getText().trim();
+            String lName = txtLastName.getText().trim();
             String user = txtUsername.getText().trim();
             String pass = new String(txtPassword.getPassword());
             String contact = txtContact.getText().trim();
+            String idType = (String) comboIdType.getSelectedItem();
             String idNum = txtIdNum.getText().trim();
 
-            if (name.isEmpty() || user.isEmpty() || pass.isEmpty() || contact.isEmpty() || idNum.isEmpty()) {
+            if (fName.isEmpty() || lName.isEmpty() || user.isEmpty() || pass.isEmpty() || contact.isEmpty() || idNum.isEmpty()) {
                 JOptionPane.showMessageDialog(this, "All fields are required!");
                 return;
             }
 
             GuestDB guestDB = new GuestDB();
 
-            if (guestDB.addGuest(name, contact, idNum, user, pass)) {
+            if (guestDB.addGuest(fName, lName, contact, idType, idNum, user, pass)) {
                 JOptionPane.showMessageDialog(this, "Success! Your guest account is created.");
                 mainFrame.showCard("LOGIN_PAGE");
                 clearFields();
             } else {
-                JOptionPane.showMessageDialog(this, "Error: Username might be taken.", "Registration Failed", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Error: Registration failed.", "Failed", JOptionPane.ERROR_MESSAGE);
             }
         });
 
@@ -100,11 +107,13 @@ public class SignUpPanel extends JPanel {
     }
 
     private void clearFields() {
-        txtName.setText("");
+        txtFirstName.setText("");
+        txtLastName.setText("");
         txtUsername.setText("");
         txtPassword.setText("");
         txtContact.setText("");
         txtIdNum.setText("");
+        comboIdType.setSelectedIndex(0);
     }
 
     private void addLabelAndField(String labelText, JComponent field, int row, GridBagConstraints gbc, JPanel container) {
@@ -116,13 +125,21 @@ public class SignUpPanel extends JPanel {
 
         gbc.gridx = 0;
         gbc.anchor = GridBagConstraints.LINE_END;
-        gbc.weightx = 0;
+        gbc.weightx = 0.1; // Give a small weight to help alignment
+        gbc.insets = new Insets(5, 20, 5, 10);
         container.add(label, gbc);
 
         gbc.gridx = 1;
         gbc.anchor = GridBagConstraints.LINE_START;
-        gbc.weightx = 0;
-        field.setPreferredSize(new Dimension(250, 30));
+        gbc.weightx = 1.0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+
+        Dimension fieldSize = new Dimension(250, 30);
+        field.setPreferredSize(fieldSize);
+        field.setMinimumSize(fieldSize);
+
+        gbc.insets = new Insets(5, 0, 5, 20);
         container.add(field, gbc);
-    }
-}
+
+        gbc.fill = GridBagConstraints.NONE;
+    }}

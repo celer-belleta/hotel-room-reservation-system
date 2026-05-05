@@ -77,3 +77,17 @@ added:
 
 changes:
     -- remove the user_id column from guests table
+DROP TABLE IF EXISTS payments;
+
+CREATE TABLE payments (
+payment_id INT PRIMARY KEY AUTO_INCREMENT,
+res_id INT, -- This links to the res_id in reservations table
+amount_paid DOUBLE, -- The specific amount paid in this transaction
+total_amount_due DOUBLE, -- The total price of the stay
+discount_amount DOUBLE, -- The 15% from CTU2026
+payment_method VARCHAR(50), -- 'Cash' or 'Card'
+payment_type VARCHAR(50), -- 'Down Payment' or 'Full Payment'
+invoice_number VARCHAR(100),
+payment_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+FOREIGN KEY (res_id) REFERENCES reservations(res_id)
+);

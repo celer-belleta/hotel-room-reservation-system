@@ -52,8 +52,8 @@ public class MainFrame extends JFrame {
         btn.setContentAreaFilled(false);
         btn.setFocusPainted(false);
         btn.setFont(new Font("Arial", Font.BOLD, 16));
-        btn.setForeground(Color.BLACK); // Default color
-        btn.setCursor(new Cursor(Cursor.HAND_CURSOR)); // Makes it look clickable
+        btn.setForeground(Color.BLACK);
+        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
         btn.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
@@ -66,22 +66,11 @@ public class MainFrame extends JFrame {
     }
 
     private JPanel createAboutPage() {
-        JPanel p = new JPanel(new BorderLayout());
-        p.setBackground(Color.WHITE);
-
-        JLabel imgLabel = new JLabel(new ImageIcon("src/resources/about_bg.jpg"));
-        p.add(imgLabel, BorderLayout.NORTH);
-        p.add(new JLabel("details about here", SwingConstants.CENTER), BorderLayout.CENTER);
-        return p;
+        return new AboutPanel();
     }
 
     private JPanel createRoomsPage() {
-        JPanel p = new JPanel(new BorderLayout());
-        p.setBackground(Color.WHITE);
-
-        p.add(new JLabel(new ImageIcon("src/resources/rooms_bg.jpg")), BorderLayout.NORTH);
-        p.add(new JLabel("display rooms and small description", SwingConstants.CENTER), BorderLayout.CENTER);
-        return p;
+        return new RoomPanel();
     }
 
     public static void main(String[] args) {

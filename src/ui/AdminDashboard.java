@@ -1,9 +1,9 @@
 package ui;
 
+import dao.AlertDB;
+
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 
 public class AdminDashboard extends JFrame {
 
@@ -11,87 +11,76 @@ public class AdminDashboard extends JFrame {
     private CardLayout cardLayout;
 
     public AdminDashboard() {
-
-        // FRAME SETTINGS
-        setTitle("Admin Dashboard");
+        setTitle("Admin Dashboard - Aurelia Grand Hotel");
         setExtendedState(JFrame.MAXIMIZED_BOTH);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
         getContentPane().setBackground(Color.WHITE);
 
-        JPanel sidebar = new JPanel();
-        sidebar.setLayout(new BoxLayout(sidebar, BoxLayout.Y_AXIS));
-        sidebar.setBackground(Color.WHITE);
-        sidebar.setPreferredSize(new Dimension(250, 0));
-        sidebar.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, Color.BLACK));
-
-        sidebar.add(Box.createRigidArea(new Dimension(0, 150)));
-
-        addSidebarNav(sidebar, "USERS", "USERS_PAGE");
-        addSidebarNav(sidebar, "GUESTS", "GUESTS_PAGE");
-        addSidebarNav(sidebar, "ROOMS", "ROOMS_PAGE");
-        addSidebarNav(sidebar, "RESERVATIONS", "RESERVATIONS_PAGE");
-        addSidebarNav(sidebar, "REPORTS", "REPORTS_PAGE");
-
-        sidebar.add(Box.createVerticalGlue());
-        addSidebarNav(sidebar, "LOGOUT", "LOGOUT_ACTION");
-        sidebar.add(Box.createRigidArea(new Dimension(0, 30)));
-
+        // Sidebar (Left)
+        AdminSidebar sidebar = new AdminSidebar(this);
         add(sidebar, BorderLayout.WEST);
 
-        JPanel centerWrapper = new JPanel(new BorderLayout());
-        centerWrapper.setBackground(Color.WHITE);
+        JPanel rightContainer = new JPanel(new BorderLayout());
+        rightContainer.setBackground(Color.WHITE);
 
-        JLabel lblHotelName = new JLabel("HOTEL NAME", SwingConstants.CENTER);
+        JLabel lblHotelName = new JLabel("AURELIA GRAND HOTEL", SwingConstants.CENTER);
         lblHotelName.setFont(new Font("Arial", Font.BOLD, 50));
-        lblHotelName.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
-        centerWrapper.add(lblHotelName, BorderLayout.NORTH);
+        lblHotelName.setBorder(BorderFactory.createEmptyBorder(40, 0, 20, 0));
+        rightContainer.add(lblHotelName, BorderLayout.NORTH);
 
-        // CardLayout Area
+        // Content Area (CardLayout)
         cardLayout = new CardLayout();
         mainContent = new JPanel(cardLayout);
         mainContent.setBackground(Color.WHITE);
 
-        // for separate panels
-        mainContent.add(new UserTablePanel(), "USERS_PAGE");
-        mainContent.add(new GuestTablePanel(), "GUESTS_PAGE");
+        // Adding pages
+        mainContent.add(new AdminSummaryPanel(), "DASHBOARD");
+        mainContent.add(new UserTablePanel(), "USER_LIST");
+        mainContent.add(new GuestTablePanel(), "GUEST_LIST");
+        mainContent.add(new RoomTablePanel("Admin"), "ROOM_LIST");
+        // mainContent.add(new PackageTablePanel(), "AMENITIES");
+        mainContent.add(new ReservationTablePanel(), "RESERVATIONS");
+        mainContent.add(new RevenueReportPanel(), "REVENUE_REPORT");
+        mainContent.add(new OccupancyReportPanel(), "OCCUPANCY_REPORT");
 
-        // Placeholder panels for other sections
-        mainContent.add(new JPanel(), "ROOMS_PAGE");
+        rightContainer.add(mainContent, BorderLayout.CENTER);
+        add(rightContainer, BorderLayout.CENTER);
 
-        centerWrapper.add(mainContent, BorderLayout.CENTER);
-        add(centerWrapper, BorderLayout.CENTER);
+        // Show Dashboard Summary by default
+        cardLayout.show(mainContent, "DASHBOARD");
 
         setVisible(true);
+
+        AlertDB alertDao = new AlertDB();
+        String dailyAlerts = alertDao.getDailySummary();
+
+        if (!dailyAlerts.equals("No urgent alerts for today!")) {
+            JOptionPane.showMessageDialog(this, dailyAlerts, "Daily Updates", JOptionPane.INFORMATION_MESSAGE);
+        }
     }
 
-    private void addSidebarNav(JPanel container, String text, String cardName) {
-        JLabel navLabel = new JLabel(text);
-        navLabel.setFont(new Font("Arial", Font.BOLD, 18));
-        navLabel.setBorder(BorderFactory.createEmptyBorder(15, 40, 15, 0));
-        navLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        navLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+    public void showPage(String cardName) {
+        if (cardName.equals("LOGOUT")) {
+            dispose();
+            new MainFrame().setVisible(true);
+        } else if (cardName.equals("DASHBOARD")) {
+            mainContent.remove(0);
 
-        navLabel.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                if (cardName.equals("LOGOUT_ACTION")) {
-                    dispose(); //
-                    new MainFrame().setVisible(true);
-                } else {
-                    cardLayout.show(mainContent, cardName);
-                }
-            }
-            @Override
-            public void mouseEntered(MouseEvent e) {
-                navLabel.setForeground(new Color(197, 160, 89)); // Maayo Gold
-            }
-            @Override
-            public void mouseExited(MouseEvent e) {
-                navLabel.setForeground(Color.BLACK);
-            }
-        });
-        container.add(navLabel);
+            mainContent.add(new AdminSummaryPanel(), "DASHBOARD", 0);
+
+            mainContent.revalidate();
+            mainContent.repaint();
+            cardLayout.show(mainContent, "DASHBOARD");
+        } else {
+            cardLayout.show(mainContent, cardName);
+        }
+    }
+    private JPanel createPlaceholder(String text) {
+        JPanel p = new JPanel(new GridBagLayout());
+        p.setBackground(Color.WHITE);
+        p.add(new JLabel(text));
+        return p;
     }
 
     public static void main(String[] args) {

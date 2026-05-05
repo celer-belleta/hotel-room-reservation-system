@@ -2,72 +2,84 @@ package ui;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class GuestDashboard extends JFrame {
+    private JPanel mainContent;
+    private CardLayout cardLayout;
+    private int currentGuestId;
 
-    private String currentUsername;
+    public GuestDashboard(String guestIdStr) {
+        try {
+            this.currentGuestId = Integer.parseInt(guestIdStr.trim());
+        } catch (NumberFormatException e) {
+            this.currentGuestId = 0;
+        }
 
-    public GuestDashboard(String username) {
-        this.currentUsername = username;
-
-        // FRAME SETTINGS
-        setTitle("Guest Dashboard");
+        setTitle("Guest Dashboard - Aurelia Grand Hotel");
         setExtendedState(JFrame.MAXIMIZED_BOTH);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
+        getContentPane().setBackground(Color.WHITE);
 
-        // TITLE
-        JLabel title = new JLabel("", SwingConstants.CENTER);
-        title.setFont(new Font("Arial", Font.BOLD, 50));
-        add(title, BorderLayout.NORTH);
+        ViewBookingsPanel bookingsPanel = new ViewBookingsPanel(currentGuestId);
 
-        // CENTER PANEL (BUTTONS)
-        JPanel panel = new JPanel();
-        panel.setLayout(new GridBagLayout());
+        RoomBookingPanel bookingPanel = new RoomBookingPanel(currentGuestId, bookingsPanel);
 
-        JPanel buttons = new JPanel();
-        buttons.setLayout(new GridLayout(4, 2, 20, 20));
+        JPanel navBar = new JPanel(new FlowLayout(FlowLayout.RIGHT, 50, 35));
+        navBar.setBackground(Color.WHITE);
+        navBar.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(220, 220, 220)));
 
-        // GUEST SPECIFIC BUTTONS
-        JButton bookRoomBtn = new JButton("Book a Reservation");
-        JButton viewMyBookingsBtn = new JButton("My Bookings (View/Cancel)");
-        JButton availableRoomsBtn = new JButton("Check Room Availability");
-        JButton editProfileBtn = new JButton("Update Contact Info");
-        JButton logoutBtn = new JButton("Logout");
+        addNavMenu(navBar, "ABOUT", "ABOUT_PAGE", null);
+        addNavMenu(navBar, "ROOMS", "VIEW_ROOMS", null);
+        addNavMenu(navBar, "BOOK NOW!", "BOOK_ROOM", null);
+        addNavMenu(navBar, "VIEW BOOKINGS", "MY_BOOKINGS", bookingsPanel);
 
-        // FONT SETTINGS
-        Font btnFont = new Font("Arial", Font.BOLD, 20);
-        bookRoomBtn.setFont(btnFont);
-        viewMyBookingsBtn.setFont(btnFont);
-        availableRoomsBtn.setFont(btnFont);
-        editProfileBtn.setFont(btnFont);
-        logoutBtn.setFont(btnFont);
+        addNavMenu(navBar, "LOGOUT", "LOGOUT", null);
 
-        buttons.add(bookRoomBtn);
-        buttons.add(viewMyBookingsBtn);
-        buttons.add(availableRoomsBtn);
-        buttons.add(editProfileBtn);
-        buttons.add(logoutBtn);
+        add(navBar, BorderLayout.NORTH);
 
-        panel.add(buttons);
-        add(panel, BorderLayout.CENTER);
+        cardLayout = new CardLayout();
+        mainContent = new JPanel(cardLayout);
 
-        // BUTTON ACTIONS
+        mainContent.add(new AboutPanel(), "ABOUT_PAGE");
+        mainContent.add(new RoomPanel(), "VIEW_ROOMS");
+        mainContent.add(bookingsPanel, "MY_BOOKINGS");
+        mainContent.add(bookingPanel, "BOOK_ROOM");
 
-        // This opens the room management but as a Guest (so they can't edit rooms)
-
-        //availableRoomsBtn.addActionListener(e -> new RoomManagementFrame("Guest").setVisible(true));
-
-        // This would be a new frame specifically for the logged-in user
-        viewMyBookingsBtn.addActionListener(e -> {
-            // new MyBookingsFrame(currentUsername).setVisible(true);
-        });
-
-        logoutBtn.addActionListener(e -> {
-            dispose();
-            new MainFrame().setVisible(true);
-        });
-
+        add(mainContent, BorderLayout.CENTER);
+        cardLayout.show(mainContent, "ABOUT_PAGE");
         setVisible(true);
+    }
+
+    private void addNavMenu(JPanel parent, String text, String cardName, ViewBookingsPanel vbp) {
+        JLabel menuLabel = new JLabel(text);
+        menuLabel.setFont(new Font("Arial", Font.BOLD, 18));
+        menuLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        menuLabel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (cardName.equals("LOGOUT")) {
+                    dispose();
+                    new MainFrame().setVisible(true);
+                } else {
+                    cardLayout.show(mainContent, cardName);
+
+                    if (vbp != null) {
+                        vbp.refreshData();
+                    }
+                }
+            }
+            @Override
+            public void mouseEntered(MouseEvent e) { menuLabel.setForeground(new Color(197, 160, 89)); }
+            @Override
+            public void mouseExited(MouseEvent e) { menuLabel.setForeground(Color.BLACK); }
+        });
+        parent.add(menuLabel);
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> new GuestDashboard("1"));
     }
 }

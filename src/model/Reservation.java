@@ -10,6 +10,10 @@ public class Reservation {
     private Date checkOut;
     private String status;
     private int packageId;
+    private double totalAmount;
+    private double amountPaid;
+
+    private double remainingBalance;
 
     public Reservation(int resId, int guestId, int roomId, Date checkIn, Date checkOut, String status, int packageId) {
         this.resId = resId;
@@ -38,4 +42,32 @@ public class Reservation {
     public void setCheckOut(Date checkOut) { this.checkOut = checkOut; }
     public void setStatus(String status) { this.status = status; }
     public void setPackageId(int packageId) { this.packageId = packageId; }
+
+    //
+    public void setTotalAmount(double totalAmount) {
+        this.totalAmount = totalAmount;
+    }
+
+    public void setAmountPaid(double amountPaid) {
+        this.amountPaid = amountPaid;
+    }
+
+
+    //
+    public double getTotalAmount() {
+        return totalAmount;
+    }
+
+    public double getAmountPaid() {
+        return amountPaid;
+    }
+
+    //
+    public double getRemainingBalance() {
+        return remainingBalance;
+    }
+
+    public void setRemainingBalance(double remainingBalance) {
+        this.remainingBalance = remainingBalance;
+    }
 }

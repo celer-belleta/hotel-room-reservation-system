@@ -11,20 +11,21 @@ import java.util.ArrayList;
 public class GuestDB {
 
     // ADD GUEST
-    public boolean addGuest(String name, String contact, String idNumber, String username, String password) {
-        String sql = "INSERT INTO guests (name, contact, id_number, username, password) VALUES (?, ?, ?, ?, ?)";
+    public boolean addGuest(String firstName, String lastName, String contact, String idType, String idNumber, String username, String password) {
+        String sql = "INSERT INTO guests (first_name, last_name, contact, id_type, id_number, username, password) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ps.setString(1, name);
-            ps.setString(2, contact);
-            ps.setString(3, idNumber);
-            ps.setString(4, username);
-            ps.setString(5, password);
+            ps.setString(1, firstName);
+            ps.setString(2, lastName);
+            ps.setString(3, contact);
+            ps.setString(4, idType);
+            ps.setString(5, idNumber);
+            ps.setString(6, username);
+            ps.setString(7, password);
 
             return ps.executeUpdate() > 0;
-
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
@@ -43,8 +44,10 @@ public class GuestDB {
             while (rs.next()) {
                 list.add(new Guest(
                         rs.getInt("guest_id"),
-                        rs.getString("name"),
+                        rs.getString("first_name"),
+                        rs.getString("last_name"),
                         rs.getString("contact"),
+                        rs.getString("id_type"),
                         rs.getString("id_number"),
                         rs.getString("username"),
                         rs.getString("password")
@@ -73,18 +76,20 @@ public class GuestDB {
     }
 
     // UPDATE GUEST
-    public boolean updateGuest(int guestId, String name, String contact, String idNumber, String username, String password) {
-        String sql = "UPDATE guests SET name = ?, contact = ?, id_number = ?, username = ?, password = ? WHERE guest_id = ?";
+    public boolean updateGuest(int guestId, String firstName, String lastName, String contact, String idType, String idNumber, String username, String password) {
+        String sql = "UPDATE guests SET first_name = ?, last_name = ?, contact = ?, id_type = ?, id_number = ?, username = ?, password = ? WHERE guest_id = ?";
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ps.setString(1, name);
-            ps.setString(2, contact);
-            ps.setString(3, idNumber);
-            ps.setString(4, username);
-            ps.setString(5, password);
-            ps.setInt(6, guestId);
+            ps.setString(1, firstName);
+            ps.setString(2, lastName);
+            ps.setString(3, contact);
+            ps.setString(4, idType);
+            ps.setString(5, idNumber);
+            ps.setString(6, username);
+            ps.setString(7, password);
+            ps.setInt(8, guestId);
 
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
@@ -122,8 +127,10 @@ public class GuestDB {
             if (rs.next()) {
                 return new Guest(
                         rs.getInt("guest_id"),
-                        rs.getString("name"),
+                        rs.getString("first_name"), // Split
+                        rs.getString("last_name"),  // Split
                         rs.getString("contact"),
+                        rs.getString("id_type"),    // Added
                         rs.getString("id_number"),
                         rs.getString("username"),
                         rs.getString("password")
@@ -133,5 +140,58 @@ public class GuestDB {
             e.printStackTrace();
         }
         return null; // Login failed
+    }
+
+    //
+    public boolean resetGuestPassword(String username, String contact, String idNumber, String newPassword) {
+        String sql = "UPDATE guests SET password = ? WHERE username = ? AND contact = ? AND id_number = ?";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, newPassword);
+            ps.setString(2, username);
+            ps.setString(3, contact);
+            ps.setString(4, idNumber);
+
+            return ps.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    //
+    public int getGuestIdByUsername(String username) {
+        int id = -1;
+        String sql = "SELECT guest_id FROM guests WHERE LOWER(TRIM(username)) = LOWER(TRIM(?))";
+        try (Connection conn = db.DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, username);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                id = rs.getInt("guest_id");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return id;
+    }
+    //
+    public String getGuestNameById(int id) {
+        String name = "";
+        String sql = "SELECT first_name, last_name FROM guests WHERE guest_id = ?";
+        try (Connection conn = db.DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                name = rs.getString("first_name") + " " + rs.getString("last_name");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return name;
     }
 }

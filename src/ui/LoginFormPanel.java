@@ -160,16 +160,16 @@ public class LoginFormPanel extends JPanel {
                 }
             }
 
-            // Try Guest Login (If no staff found)
-            String guestSql = "SELECT name FROM guests WHERE username=? AND password=?";
+            String guestSql = "SELECT guest_id FROM guests WHERE username=? AND password=?";
             try (PreparedStatement ps = conn.prepareStatement(guestSql)) {
                 ps.setString(1, user);
                 ps.setString(2, pass);
                 ResultSet rs = ps.executeQuery();
 
                 if (rs.next()) {
+                    int id = rs.getInt("guest_id");
                     parentFrame.dispose();
-                    new GuestDashboard(user).setVisible(true);
+                    new GuestDashboard(String.valueOf(id)).setVisible(true);
                 } else {
                     lblError.setText("Invalid username or password");
                 }

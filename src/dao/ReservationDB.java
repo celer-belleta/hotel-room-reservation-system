@@ -7,40 +7,35 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.time.LocalDate;
 
-// ReservationDB handles all database operations related to Bookings.
-// This includes checking room availability, creating new reservations,
-// and managing existing records (viewing and cancelling).
-
 public class ReservationDB {
 
-    // AVAILABILITY CHECK (The "Overlap" Logic)
     public boolean isRoomAvailable(int roomId, Date start, Date end) {
+        // UPDATED: Added 'Pending' so the room is blocked immediately upon booking
         String sql = "SELECT COUNT(*) FROM reservations " +
-                "WHERE room_id = ? AND status = 'Confirmed' " +
+                "WHERE room_id = ? AND status IN ('Pending', 'Confirmed', 'Checked-In', 'Occupied') " +
                 "AND (check_in < ? AND check_out > ?)";
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, roomId);
-            ps.setDate(2, end); // Closes the gap
-            ps.setDate(3, start); // Checks the start
+            ps.setDate(2, end);
+            ps.setDate(3, start);
 
             ResultSet rs = ps.executeQuery();
-            if (rs.next()) return rs.getInt(1) == 0;
+            if (rs.next()) {
+                return rs.getInt(1) == 0;
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return false;
-    }
-
-    // CREATE RESERVATION
-    public int createReservation(int guestId, int roomId, Date checkIn, Date checkOut, int packageId) {
+    }    public int createReservation(int guestId, int roomId, Date checkIn, Date checkOut, int packageId) {
         if (!isRoomAvailable(roomId, checkIn, checkOut)) {
             JOptionPane.showMessageDialog(null, "Room is already booked for these dates!");
             return -1;
         }
 
-        String sql = "INSERT INTO reservations (guest_id, room_id, check_in, check_out, package_id, status) VALUES (?, ?, ?, ?, ?, 'Confirmed')";
+        String sql = "INSERT INTO reservations (guest_id, room_id, check_in, check_out, package_id, status) VALUES (?, ?, ?, ?, ?, 'Pending')";
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -51,19 +46,9 @@ public class ReservationDB {
             ps.setInt(5, packageId);
 
             ps.executeUpdate();
-
-            // Get the generated reservation ID
             ResultSet rs = ps.getGeneratedKeys();
             if (rs.next()) {
-                int generatedId = rs.getInt(1);
-
-                // Only update status to Occupied if the booking starts today
-                LocalDate today = LocalDate.now();
-                if (checkIn.toLocalDate().equals(today)) {
-                    new RoomDB().updateRoomStatus(roomId, "Occupied");
-                }
-
-                return generatedId; // Return the actual ID
+                return rs.getInt(1);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -71,21 +56,28 @@ public class ReservationDB {
         return -1;
     }
 
-    // CANCEL RESERVATION (returns true/false)
+    public boolean updateStatus(int resId, String newStatus) {
+        String sql = "UPDATE reservations SET status = ? WHERE res_id = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, newStatus);
+            ps.setInt(2, resId);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     public boolean cancelReservation(int resId, int roomId) {
         String sql = "UPDATE reservations SET status = 'Cancelled' WHERE res_id = ?";
-
         try (Connection conn = DBConnection.getConnection()) {
-            conn.setAutoCommit(false); // Start transaction
-
+            conn.setAutoCommit(false);
             try (PreparedStatement ps = conn.prepareStatement(sql)) {
                 ps.setInt(1, resId);
                 ps.executeUpdate();
             }
-
-            // make the room available again
             new RoomDB().updateRoomStatus(roomId, "Available");
-
             conn.commit();
             return true;
         } catch (SQLException e) {
@@ -94,26 +86,26 @@ public class ReservationDB {
         }
     }
 
-    // GET RESERVATIONS
     public ArrayList<Reservation> getAllReservations() {
         ArrayList<Reservation> list = new ArrayList<>();
 
-        // Join with packages to ensure we only get reservations linked to valid packages
-        String sql = "SELECT r.* FROM reservations r " +
-                "JOIN packages p ON r.package_id = p.package_id";
+        String sql = "SELECT * FROM reservations";
         try (Connection conn = DBConnection.getConnection();
              Statement st = conn.createStatement();
              ResultSet rs = st.executeQuery(sql)) {
             while (rs.next()) {
-                list.add(new Reservation(
-                        rs.getInt("res_id"),
-                        rs.getInt("guest_id"),
-                        rs.getInt("room_id"),
-                        rs.getDate("check_in"),
-                        rs.getDate("check_out"),
-                        rs.getString("status"),
-                        rs.getInt("package_id")
-                ));
+                Reservation res = new Reservation(
+                        rs.getInt("res_id"), rs.getInt("guest_id"), rs.getInt("room_id"),
+                        rs.getDate("check_in"), rs.getDate("check_out"),
+                        rs.getString("status"), rs.getInt("package_id")
+                );
+
+                res.setTotalAmount(rs.getDouble("total_amount"));
+                res.setAmountPaid(rs.getDouble("amount_paid"));
+
+                res.setRemainingBalance(rs.getDouble("remaining_balance"));
+
+                list.add(res);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -121,31 +113,10 @@ public class ReservationDB {
         return list;
     }
 
-    // UPDATE RESERVATION (For editing dates)
-    public boolean updateReservation(int resId, Date checkIn, Date checkOut) {
-        String sql = "UPDATE reservations SET check_in = ?, check_out = ? WHERE res_id = ?";
-
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            ps.setDate(1, checkIn);
-            ps.setDate(2, checkOut);
-            ps.setInt(3, resId);
-
-            return ps.executeUpdate() > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    // DELETE RESERVATION (Permanent Removal)
     public boolean deleteReservation(int resId) {
         String sql = "DELETE FROM reservations WHERE res_id = ?";
-
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
-
             ps.setInt(1, resId);
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
@@ -154,31 +125,67 @@ public class ReservationDB {
         }
     }
 
-    // this method is for the Guest to see ONLY their own history
-    public ArrayList<model.Reservation> getReservationsByGuestId(int guestId) {
-        ArrayList<model.Reservation> list = new ArrayList<>();
-        String sql = "SELECT * FROM reservations WHERE guest_id = ? AND status != 'Cancelled'";
+    public int getNewReservationsToday() {
+        int count = 0;
+        String query = "SELECT COUNT(*) FROM reservations WHERE DATE(check_in) = CURDATE()";
 
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (java.sql.Connection conn = db.DBConnection.getConnection();
+             java.sql.PreparedStatement ps = conn.prepareStatement(query)) {
 
-            ps.setInt(1, guestId);
-            ResultSet rs = ps.executeQuery();
+            java.sql.ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                count = rs.getInt(1);
+            }
+        } catch (java.sql.SQLException e) {
+            e.printStackTrace();
+        }
+        return count;
+    }
 
-            while (rs.next()) {
-                list.add(new model.Reservation(
-                        rs.getInt("res_id"),
-                        rs.getInt("guest_id"),
-                        rs.getInt("room_id"),
-                        rs.getDate("check_in"),
-                        rs.getDate("check_out"),
-                        rs.getString("status"),
-                        rs.getInt("package_id")
-                ));
+    public boolean processCheckIn(int resId, int roomId) {
+        String sql = "UPDATE reservations SET status = 'Checked-In' WHERE res_id = ?";
+        try (Connection conn = DBConnection.getConnection()) {
+            conn.setAutoCommit(false); // Start transaction
+            try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                ps.setInt(1, resId);
+                ps.executeUpdate();
+
+                // Updates the room status to Occupied
+                new RoomDB().updateRoomStatus(roomId, "Occupied");
+
+                conn.commit(); // Save changes
+                return true;
+            } catch (SQLException e) {
+                conn.rollback(); // Undo changes if something goes wrong
+                e.printStackTrace(); // LOOK AT YOUR CONSOLE FOR THE RED TEXT
+                return false;
             }
         } catch (SQLException e) {
             e.printStackTrace();
+            return false;
         }
-        return list;
+    }
+
+    public boolean processCheckOut(int resId, int roomId) {
+        String sql = "UPDATE reservations SET status = 'Checked-Out' WHERE res_id = ?";
+        try (Connection conn = DBConnection.getConnection()) {
+            conn.setAutoCommit(false); // Start transaction
+            try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                ps.setInt(1, resId);
+                ps.executeUpdate();
+
+                new RoomDB().updateRoomStatus(roomId, "Available");
+
+                conn.commit();
+                return true;
+            } catch (SQLException e) {
+                conn.rollback();
+                e.printStackTrace();
+                return false;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 }

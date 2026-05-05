@@ -1,12 +1,13 @@
 package ui;
 
 import dao.UserDB;
-
 import javax.swing.*;
 import java.awt.*;
 
 public class AddUserFrame extends JFrame {
 
+    private JTextField firstNameField;
+    private JTextField lastNameField;
     private JTextField usernameField;
     private JTextField passwordField;
     private JComboBox<String> roleComboBox;
@@ -17,9 +18,18 @@ public class AddUserFrame extends JFrame {
         this.parentPanel = parent;
 
         setTitle("Add User");
-        setSize(400, 300);
+        setSize(400, 400);
         setLocationRelativeTo(null);
-        setLayout(new GridLayout(4, 2, 10, 10));
+
+        setLayout(new GridLayout(6, 2, 10, 10));
+
+        add(new JLabel("First Name:"));
+        firstNameField = new JTextField();
+        add(firstNameField);
+
+        add(new JLabel("Last Name:"));
+        lastNameField = new JTextField();
+        add(lastNameField);
 
         add(new JLabel("Username:"));
         usernameField = new JTextField();
@@ -35,28 +45,33 @@ public class AddUserFrame extends JFrame {
         add(roleComboBox);
 
         JButton addBtn = new JButton("Confirm");
+        JButton cancelBtn = new JButton("Cancel");
 
-        // BUTTON ACTION
+        // BUTTON ACTIONS
         addBtn.addActionListener(e -> addUser());
+        cancelBtn.addActionListener(e -> dispose());
 
-        add(new JLabel());
         add(addBtn);
+        add(cancelBtn);
 
         setVisible(true);
     }
 
     private void addUser() {
-        String username = usernameField.getText();
-        String password = passwordField.getText();
+        String fName = firstNameField.getText().trim();
+        String lName = lastNameField.getText().trim();
+        String username = usernameField.getText().trim();
+        String password = passwordField.getText().trim();
         String role = (String) roleComboBox.getSelectedItem();
 
-        if (username.isEmpty() || password.isEmpty()) {
+        if (fName.isEmpty() || lName.isEmpty() || username.isEmpty() || password.isEmpty()) {
             JOptionPane.showMessageDialog(this, "All fields are required!");
             return;
         }
 
         UserDB db = new UserDB();
-        boolean success = db.addUser(username, password, role);
+
+        boolean success = db.addUser(fName, lName, username, password, role);
 
         if (success) {
             JOptionPane.showMessageDialog(this, "User added successfully!");

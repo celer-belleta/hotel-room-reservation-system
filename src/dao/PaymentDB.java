@@ -19,45 +19,58 @@ public class PaymentDB {
         return nights * roomPrice;
     }
 
-    // Save the payment to the database
     public boolean processPayment(int resId, double amountPaid, double totalDue, double discount, String method, String type, String invoice) {
-        String sql = "INSERT INTO payments (res_id, amount_paid, total_amount_due, discount_amount, payment_method, payment_type, invoice_number) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String sqlInsert = "INSERT INTO payments (res_id, amount_paid, total_amount_due, discount_amount, payment_method, payment_type, invoice_number) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        // FIXED: Subtracts BOTH the cash payment and the discount from the remaining_balance[cite: 12]
+        String sqlUpdate = "UPDATE reservations SET amount_paid = amount_paid + ?, remaining_balance = remaining_balance - (? + ?) WHERE res_id = ?";
 
-            ps.setInt(1, resId);
-            ps.setDouble(2, amountPaid); // This is the Downpayment or Full payment
-            ps.setDouble(3, totalDue);   // The original price after promo/discount
-            ps.setDouble(4, discount);   // The amount saved
-            ps.setString(5, method);     // Cash, Card, etc.
-            ps.setString(6, type);       // "Downpayment" or "Full"
-            ps.setString(7, invoice);
+        try (Connection conn = db.DBConnection.getConnection()) {
+            conn.setAutoCommit(false); // Start transaction for data safety[cite: 12]
 
-            return ps.executeUpdate() > 0;
+            // 1. Record the payment details in the payments table[cite: 12]
+            try (PreparedStatement ps1 = conn.prepareStatement(sqlInsert)) {
+                ps1.setInt(1, resId);
+                ps1.setDouble(2, amountPaid);
+                ps1.setDouble(3, totalDue);
+                ps1.setDouble(4, discount);
+                ps1.setString(5, method);
+                ps1.setString(6, type);
+                ps1.setString(7, invoice);
+                ps1.executeUpdate();
+            }
+
+            // 2. Update the reservation totals and balance[cite: 12]
+            try (PreparedStatement ps2 = conn.prepareStatement(sqlUpdate)) {
+                ps2.setDouble(1, amountPaid); // Add to the 'amount_paid' running total[cite: 12]
+                ps2.setDouble(2, amountPaid); // Deduct cash from 'remaining_balance'[cite: 12]
+                ps2.setDouble(3, discount);   // Deduct discount from 'remaining_balance'[cite: 12]
+                ps2.setInt(4, resId);
+                ps2.executeUpdate();
+            }
+
+            conn.commit(); // Finalize changes[cite: 12]
+            return true;
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
         }
     }
-
     // REVENUE REPORT
-    public double getTotalRevenue(int daysBack) {
+    public double getTotalRevenue(int days) {
         double total = 0;
-
-        // SQL: "Add up all amount_paid where the date is within the last X days"
-        String sql = "SELECT SUM(amount_paid) as total FROM payments " +
-                "WHERE payment_date >= DATE_SUB(CURDATE(), INTERVAL ? DAY)";
+        String sql = "SELECT SUM(amount_paid) FROM payments " +
+                "WHERE payment_date >= CURDATE() - INTERVAL ? DAY";
 
         try (Connection conn = db.DBConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+             PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            pstmt.setInt(1, daysBack); // Set how many days to look back (7 for week, 30 for month)
-            ResultSet rs = pstmt.executeQuery();
+            ps.setInt(1, days);
 
-            if (rs.next()) {
-                total = rs.getDouble("total");
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    total = rs.getDouble(1);
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -69,8 +82,12 @@ public class PaymentDB {
     public double calculateFinalDiscount(double originalTotal, String promoCode, boolean isSeniorOrPWD) {
         double discountAmount = 0.0;
 
-        // PROMO CODE
-        if (promoCode.equalsIgnoreCase("MAAYO2026")) {
+        // PROMO CODE: CTU2026 for a 15% discount
+        if (promoCode.equalsIgnoreCase("CTU2026")) {
+            discountAmount = originalTotal * 0.15;
+        }
+        // AURELIA10 - 10%
+        else if (promoCode.equalsIgnoreCase("AURELIA10")) {
             discountAmount = originalTotal * 0.10;
         }
         // SENIOR/PWD DISCOUNT
