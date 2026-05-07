@@ -9,7 +9,7 @@ public class ClerkDashboard extends JFrame {
     private CardLayout cardLayout;
 
     public ClerkDashboard() {
-        setTitle("Guest Dashboard - Aurelia Grand Hotel");
+        setTitle("Clerk Dashboard - Aurelia Grand Hotel");
         setExtendedState(JFrame.MAXIMIZED_BOTH);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());

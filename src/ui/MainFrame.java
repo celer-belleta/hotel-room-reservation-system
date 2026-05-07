@@ -37,7 +37,12 @@ public class MainFrame extends JFrame {
         mainContent.add(createRoomsPage(), "ROOMS_PAGE");
         mainContent.add(new LoginFormPanel(this), "LOGIN_PAGE");
         mainContent.add(new SignUpPanel(this), "SIGNUP_PAGE");
-        mainContent.add(new ForgotPasswordPanel(this), "FORGOT_PASSWORD_PAGE");
+         mainContent.add(new ForgotPasswordPanel(this), "FORGOT_PASSWORD_PAGE");
+
+        mainContent.add(new SuperiorDetailsPanel(null), "SUPERIOR_ROOM_DETAILS");
+        mainContent.add(new DeluxeDetailsPanel(null), "DELUXE_ROOM_DETAILS");
+        mainContent.add(new FamilyDetailsPanel(null), "FAMILY_ROOM_DETAILS");
+        mainContent.add(new SpecialtyDetailsPanel(null), "SPECIALTY_ROOM_DETAILS");
 
         add(mainContent, BorderLayout.CENTER);
 
@@ -59,10 +64,14 @@ public class MainFrame extends JFrame {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
                 btn.setForeground(new Color(197, 160, 89));
             }
-
             public void mouseExited(java.awt.event.MouseEvent evt) {
-                btn.setForeground(Color.BLACK);            }
+                btn.setForeground(Color.BLACK);
+            }
         });
+    }
+
+    public void showPage(String pageName) {
+        cardLayout.show(mainContent, pageName);
     }
 
     private JPanel createAboutPage() {
@@ -70,7 +79,7 @@ public class MainFrame extends JFrame {
     }
 
     private JPanel createRoomsPage() {
-        return new RoomPanel();
+        return new RoomPanel(this);
     }
 
     public static void main(String[] args) {

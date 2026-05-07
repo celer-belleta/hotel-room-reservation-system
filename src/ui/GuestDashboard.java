@@ -24,7 +24,6 @@ public class GuestDashboard extends JFrame {
         getContentPane().setBackground(Color.WHITE);
 
         ViewBookingsPanel bookingsPanel = new ViewBookingsPanel(currentGuestId);
-
         RoomBookingPanel bookingPanel = new RoomBookingPanel(currentGuestId, bookingsPanel);
 
         JPanel navBar = new JPanel(new FlowLayout(FlowLayout.RIGHT, 50, 35));
@@ -35,7 +34,6 @@ public class GuestDashboard extends JFrame {
         addNavMenu(navBar, "ROOMS", "VIEW_ROOMS", null);
         addNavMenu(navBar, "BOOK NOW!", "BOOK_ROOM", null);
         addNavMenu(navBar, "VIEW BOOKINGS", "MY_BOOKINGS", bookingsPanel);
-
         addNavMenu(navBar, "LOGOUT", "LOGOUT", null);
 
         add(navBar, BorderLayout.NORTH);
@@ -44,13 +42,22 @@ public class GuestDashboard extends JFrame {
         mainContent = new JPanel(cardLayout);
 
         mainContent.add(new AboutPanel(), "ABOUT_PAGE");
-        mainContent.add(new RoomPanel(), "VIEW_ROOMS");
+        mainContent.add(new RoomPanel(this), "VIEW_ROOMS");
         mainContent.add(bookingsPanel, "MY_BOOKINGS");
         mainContent.add(bookingPanel, "BOOK_ROOM");
+
+        mainContent.add(new SuperiorDetailsPanel(null), "SUPERIOR_ROOM_DETAILS");
+        mainContent.add(new DeluxeDetailsPanel(null), "DELUXE_ROOM_DETAILS");
+        mainContent.add(new FamilyDetailsPanel(null), "FAMILY_ROOM_DETAILS");
+        mainContent.add(new SpecialtyDetailsPanel(null), "SPECIALTY_ROOM_DETAILS");
 
         add(mainContent, BorderLayout.CENTER);
         cardLayout.show(mainContent, "ABOUT_PAGE");
         setVisible(true);
+    }
+
+    public void showPage(String cardName) {
+        cardLayout.show(mainContent, cardName);
     }
 
     private void addNavMenu(JPanel parent, String text, String cardName, ViewBookingsPanel vbp) {
@@ -65,7 +72,6 @@ public class GuestDashboard extends JFrame {
                     new MainFrame().setVisible(true);
                 } else {
                     cardLayout.show(mainContent, cardName);
-
                     if (vbp != null) {
                         vbp.refreshData();
                     }

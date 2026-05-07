@@ -3,26 +3,30 @@ package ui;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class RoomPanel extends JPanel {
     private final String imageDir = "src/images/";
+    private JFrame dashboard;
 
-    public RoomPanel() {
+    public RoomPanel(JFrame dashboard) {
+        this.dashboard = dashboard;
         setLayout(new BorderLayout());
         setBackground(Color.WHITE);
 
         JPanel headerPanel = new JPanel();
         headerPanel.setLayout(new BoxLayout(headerPanel, BoxLayout.Y_AXIS));
         headerPanel.setBackground(Color.WHITE);
-        headerPanel.setBorder(new EmptyBorder(20, 0, 20, 0)); // Reduced vertical padding
+        headerPanel.setBorder(new EmptyBorder(20, 0, 20, 0));
 
         JLabel lblMainTitle = new JLabel("AURELIA GRAND ROOMS");
-        lblMainTitle.setFont(new Font("Serif", Font.PLAIN, 24)); // Smaller title size
+        lblMainTitle.setFont(new Font("Serif", Font.PLAIN, 24));
         lblMainTitle.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         JPanel underline = new JPanel();
         underline.setBackground(new Color(52, 73, 94));
-        underline.setMaximumSize(new Dimension(40, 2)); // Smaller underline
+        underline.setMaximumSize(new Dimension(40, 2));
 
         headerPanel.add(lblMainTitle);
         headerPanel.add(Box.createRigidArea(new Dimension(0, 8)));
@@ -59,8 +63,45 @@ public class RoomPanel extends JPanel {
 
         card.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(new Color(230, 230, 230), 1),
-                BorderFactory.createEmptyBorder(0, 0, 10, 0) // Reduced bottom padding
+                BorderFactory.createEmptyBorder(0, 0, 10, 0)
         ));
+
+        card.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                String pageName = title.toUpperCase().replace(" ", "_") + "_DETAILS";
+
+                if (dashboard instanceof MainFrame) {
+                    ((MainFrame) dashboard).showCard(pageName);
+                } else if (dashboard instanceof AdminDashboard) {
+                    ((AdminDashboard) dashboard).showPage(pageName);
+                } else if (dashboard instanceof ClerkDashboard) {
+                    ((ClerkDashboard) dashboard).showPage(pageName);
+                } else if (dashboard instanceof GuestDashboard) {
+                    try {
+                        dashboard.getClass().getMethod("showPage", String.class).invoke(dashboard, pageName);
+                    } catch (Exception ex) {
+                    }
+                }
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                card.setBorder(BorderFactory.createCompoundBorder(
+                        BorderFactory.createLineBorder(new Color(197, 160, 89), 2),
+                        BorderFactory.createEmptyBorder(0, 0, 10, 0)
+                ));
+                card.setCursor(new Cursor(Cursor.HAND_CURSOR));
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                card.setBorder(BorderFactory.createCompoundBorder(
+                        BorderFactory.createLineBorder(new Color(230, 230, 230), 1),
+                        BorderFactory.createEmptyBorder(0, 0, 10, 0)
+                ));
+            }
+        });
 
         JLabel imgLabel = new JLabel() {
             @Override
@@ -83,11 +124,11 @@ public class RoomPanel extends JPanel {
         JPanel textPanel = new JPanel();
         textPanel.setLayout(new BoxLayout(textPanel, BoxLayout.Y_AXIS));
         textPanel.setBackground(Color.WHITE);
-        textPanel.setBorder(new EmptyBorder(10, 20, 10, 20)); // Compact text padding
+        textPanel.setBorder(new EmptyBorder(10, 20, 10, 20));
         textPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         JLabel lblTitle = new JLabel(title.toUpperCase());
-        lblTitle.setFont(new Font("Arial", Font.BOLD, 16)); // Slightly smaller title
+        lblTitle.setFont(new Font("Arial", Font.BOLD, 16));
         lblTitle.setForeground(new Color(44, 62, 80));
 
         JLabel lblDesc = new JLabel("<html><body style='width: 250px;'>" + description + "</body></html>");
