@@ -9,16 +9,21 @@ public class AdminSidebar extends JPanel {
     private AdminDashboard dashboard;
     private final String chevron = "  \u25BC";
 
+    private final Color NAVY_BLUE = new Color(44, 62, 80);
+    private final Color AURELIA_GOLD = new Color(197, 160, 89);
+
     public AdminSidebar(AdminDashboard dashboard) {
         this.dashboard = dashboard;
         this.setPreferredSize(new Dimension(260, 0));
-        this.setBackground(Color.WHITE);
+
+        this.setBackground(NAVY_BLUE);
         this.setLayout(new BorderLayout());
-        this.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, Color.BLACK));
+
+        this.setBorder(null);
 
         JPanel menuPanel = new JPanel();
         menuPanel.setLayout(new BoxLayout(menuPanel, BoxLayout.Y_AXIS));
-        menuPanel.setBackground(Color.WHITE);
+        menuPanel.setBackground(NAVY_BLUE);
 
         menuPanel.add(Box.createRigidArea(new Dimension(0, 110)));
 
@@ -34,7 +39,6 @@ public class AdminSidebar extends JPanel {
 
         addDropdownMenu(menuPanel, "ROOMS", new String[][]{
                 {"Manage Rooms", "ROOM_LIST"}
-                //{"Amenities and Packages", "AMENITIES"}
         });
 
         addDropdownMenu(menuPanel, "RESERVATIONS", new String[][]{
@@ -49,9 +53,10 @@ public class AdminSidebar extends JPanel {
         add(menuPanel, BorderLayout.CENTER);
 
         JPanel bottomPanel = new JPanel(new BorderLayout());
-        bottomPanel.setBackground(Color.WHITE);
+        bottomPanel.setBackground(NAVY_BLUE);
 
         JLabel lblLogout = new JLabel("LOGOUT");
+        lblLogout.setForeground(Color.WHITE);
         lblLogout.setFont(new Font("Arial", Font.BOLD, 18));
         lblLogout.setBorder(BorderFactory.createEmptyBorder(20, 40, 30, 0));
         lblLogout.setCursor(new Cursor(Cursor.HAND_CURSOR));
@@ -60,9 +65,9 @@ public class AdminSidebar extends JPanel {
             @Override
             public void mouseClicked(MouseEvent e) { dashboard.showPage("LOGOUT"); }
             @Override
-            public void mouseEntered(MouseEvent e) { lblLogout.setForeground(new Color(197, 160, 89)); }
+            public void mouseEntered(MouseEvent e) { lblLogout.setForeground(AURELIA_GOLD); }
             @Override
-            public void mouseExited(MouseEvent e) { lblLogout.setForeground(Color.BLACK); }
+            public void mouseExited(MouseEvent e) { lblLogout.setForeground(Color.WHITE); }
         });
 
         bottomPanel.add(lblLogout, BorderLayout.SOUTH);
@@ -71,6 +76,7 @@ public class AdminSidebar extends JPanel {
 
     private void addNavHeader(JPanel parent, String text, String card) {
         JLabel label = new JLabel(text);
+        label.setForeground(Color.WHITE);
         label.setFont(new Font("Arial", Font.BOLD, 18));
         label.setBorder(BorderFactory.createEmptyBorder(8, 40, 8, 0));
         label.setCursor(new Cursor(Cursor.HAND_CURSOR));
@@ -79,9 +85,9 @@ public class AdminSidebar extends JPanel {
             @Override
             public void mouseClicked(MouseEvent e) { dashboard.showPage(card); }
             @Override
-            public void mouseEntered(MouseEvent e) { label.setForeground(new Color(197, 160, 89)); }
+            public void mouseEntered(MouseEvent e) { label.setForeground(AURELIA_GOLD); }
             @Override
-            public void mouseExited(MouseEvent e) { label.setForeground(Color.BLACK); }
+            public void mouseExited(MouseEvent e) { label.setForeground(Color.WHITE); }
         });
         parent.add(label);
     }
@@ -89,10 +95,11 @@ public class AdminSidebar extends JPanel {
     private void addDropdownMenu(JPanel parent, String title, String[][] subItems) {
         JPanel subPanel = new JPanel();
         subPanel.setLayout(new BoxLayout(subPanel, BoxLayout.Y_AXIS));
-        subPanel.setBackground(Color.WHITE);
+        subPanel.setBackground(NAVY_BLUE);
         subPanel.setVisible(false);
 
         JLabel mainLabel = new JLabel(title + chevron);
+        mainLabel.setForeground(Color.WHITE);
         mainLabel.setFont(new Font("Arial", Font.BOLD, 18));
         mainLabel.setBorder(BorderFactory.createEmptyBorder(8, 40, 8, 0));
         mainLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
@@ -105,9 +112,9 @@ public class AdminSidebar extends JPanel {
                 parent.repaint();
             }
             @Override
-            public void mouseEntered(MouseEvent e) { mainLabel.setForeground(new Color(197, 160, 89)); }
+            public void mouseEntered(MouseEvent e) { mainLabel.setForeground(AURELIA_GOLD); }
             @Override
-            public void mouseExited(MouseEvent e) { mainLabel.setForeground(Color.BLACK); }
+            public void mouseExited(MouseEvent e) { mainLabel.setForeground(Color.WHITE); }
         });
 
         parent.add(mainLabel);
@@ -122,11 +129,11 @@ public class AdminSidebar extends JPanel {
                 @Override
                 public void mouseClicked(MouseEvent e) { dashboard.showPage(item[1]); }
                 @Override
-                public void mouseEntered(MouseEvent e) { subLabel.setForeground(new Color(197, 160, 89)); }
+                public void mouseEntered(MouseEvent e) { subLabel.setForeground(AURELIA_GOLD); }
                 @Override
-                public void mouseExited(MouseEvent e) { subLabel.setForeground(Color.BLACK); }
+                public void mouseExited(MouseEvent e) { subLabel.setForeground(new Color(200, 200, 200)); }
             });
-            subLabel.setForeground(Color.BLACK);
+            subLabel.setForeground(new Color(200, 200, 200));
             subPanel.add(subLabel);
         }
         parent.add(subPanel);

@@ -20,18 +20,28 @@ public class RoomBookingPanel extends JPanel {
     private int startMonthIndex = 4; // May 2026
     private double currentTotal = 0.0;
     private int cartItemCount = 0;
-    private int currentGuestCount = 2;
+
+    private int countAdults = 2;
+    private int countSeniors = 0;
+    private int countPWDs = 0;
+    private int countChildren = 0;
 
     private Calendar checkInCal = null;
     private Calendar checkOutCal = null;
 
     private final Color AURELIA_GOLD = new Color(197, 160, 89);
+    private final Color NAVY_BLUE = new Color(44, 62, 80);
     private final Color BG_COLOR = new Color(255, 255, 255);
 
-    private Room selectedRoom = null;
+    private final ArrayList<CartItem> selectedRoomsList = new ArrayList<>();
+
     private int loggedInGuestId;
 
     private ViewBookingsPanel viewBookingsRef;
+
+    private JLabel lblNightsHeader;
+
+    private JTextArea txtCartList;
 
     public RoomBookingPanel(int guestId, ViewBookingsPanel vbp) {
         this.loggedInGuestId = guestId;
@@ -39,11 +49,11 @@ public class RoomBookingPanel extends JPanel {
         this.roomDB = new RoomDB();
 
         setLayout(new BorderLayout());
-        setBackground(BG_COLOR);
+        setBackground(NAVY_BLUE);
 
         JPanel mainContent = new JPanel();
         mainContent.setLayout(new BoxLayout(mainContent, BoxLayout.Y_AXIS));
-        mainContent.setBackground(BG_COLOR);
+        mainContent.setBackground(NAVY_BLUE);
         mainContent.setBorder(new EmptyBorder(20, 40, 20, 40));
 
         JPanel statusHeader = createStatusHeader();
@@ -56,11 +66,11 @@ public class RoomBookingPanel extends JPanel {
         mainContent.add(navPanel);
 
         JPanel calWrapper = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
-        calWrapper.setBackground(BG_COLOR);
+        calWrapper.setBackground(NAVY_BLUE);
         calWrapper.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         calendarContainer = new JPanel(new GridLayout(1, 2, 40, 0));
-        calendarContainer.setBackground(BG_COLOR);
+        calendarContainer.setBackground(NAVY_BLUE);
         updateCalendarDisplay();
 
         calWrapper.add(calendarContainer);
@@ -77,18 +87,19 @@ public class RoomBookingPanel extends JPanel {
 
         dynamicContentPanel = new JPanel();
         dynamicContentPanel.setLayout(new BoxLayout(dynamicContentPanel, BoxLayout.Y_AXIS));
-        dynamicContentPanel.setBackground(BG_COLOR);
+        dynamicContentPanel.setBackground(NAVY_BLUE);
         dynamicContentPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
         loadRoomsByPackage();
         mainContent.add(dynamicContentPanel);
 
         JPanel scrollWrapper = new JPanel(new BorderLayout());
-        scrollWrapper.setBackground(BG_COLOR);
+        scrollWrapper.setBackground(NAVY_BLUE);
         scrollWrapper.add(mainContent, BorderLayout.NORTH);
 
         JScrollPane scroll = new JScrollPane(scrollWrapper);
         scroll.setBorder(null);
         scroll.getVerticalScrollBar().setUnitIncrement(25);
+        scroll.getViewport().setBackground(NAVY_BLUE);
         scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 
@@ -125,14 +136,15 @@ public class RoomBookingPanel extends JPanel {
         dynamicContentPanel.revalidate();
         dynamicContentPanel.repaint();
     }
+
     private void addPackageSection(String title, double extraPrice, String desc, ArrayList<Room> rooms) {
         JPanel sectionHeader = new JPanel(new BorderLayout());
-        sectionHeader.setBackground(new Color(250, 250, 250));
+        sectionHeader.setBackground(new Color(245, 245, 245));
         sectionHeader.setBorder(new EmptyBorder(15, 10, 10, 10));
         sectionHeader.setMaximumSize(new Dimension(1600, 85));
         sectionHeader.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        JLabel lblTitle = new JLabel("<html><b style='font-size:14pt; color:#333;'>" + title + "</b><br><font color='gray'>" + desc + "</font></html>");
+        JLabel lblTitle = new JLabel("<html><b style='font-size:14pt; color:#2C3E50;'>" + title + "</b><br><font color='gray'>" + desc + "</font></html>");
         sectionHeader.add(lblTitle, BorderLayout.WEST);
 
         boolean found = false;
@@ -149,7 +161,8 @@ public class RoomBookingPanel extends JPanel {
                 isDateAvailable = resDB.isRoomAvailable(r.getId(), sqlIn, sqlOut);
             }
 
-            if (isDateAvailable && r.getMaxGuest() >= currentGuestCount) {
+            int totalPeople = countAdults + countSeniors + countPWDs + countChildren;
+            if (isDateAvailable && r.getMaxGuest() >= totalPeople) {
                 if (!found) dynamicContentPanel.add(sectionHeader);
                 JPanel row = createRoomRow(r, extraPrice);
                 row.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -160,6 +173,7 @@ public class RoomBookingPanel extends JPanel {
 
         if (found) dynamicContentPanel.add(Box.createRigidArea(new Dimension(0, 30)));
     }
+
     private JPanel createRoomRow(Room r, double extra) {
         JPanel row = new JPanel(new BorderLayout(25, 0));
         row.setBackground(BG_COLOR);
@@ -179,7 +193,7 @@ public class RoomBookingPanel extends JPanel {
                 g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
 
                 String type = (r.getType() == null) ? "" : r.getType().toLowerCase();
-                String filename = "superior.jpg"; // Default fallback
+                String filename = "superior.jpg";
 
                 if (type.contains("deluxe")) filename = "deluxe.jpg";
                 else if (type.contains("family")) filename = "family.jpg";
@@ -199,13 +213,13 @@ public class RoomBookingPanel extends JPanel {
         };
         imgBox.setPreferredSize(new Dimension(240, 150));
         imgBox.setBackground(new Color(240, 240, 240));
-        imgBox.setBorder(BorderFactory.createLineBorder(new Color(220, 220, 220)));
+        imgBox.setBorder(BorderFactory.createLineBorder(NAVY_BLUE));
 
         JPanel info = new JPanel(new GridLayout(3, 1, 0, 5));
         info.setBackground(BG_COLOR);
         JLabel lblName = new JLabel(r.getType() + " (Room " + r.getRoomNumber() + ")");
         lblName.setFont(new Font("Serif", Font.BOLD, 19));
-        lblName.setForeground(AURELIA_GOLD);
+        lblName.setForeground(NAVY_BLUE);
 
         String amenities = getAmenitiesByType(r.getType());
         info.add(lblName);
@@ -219,27 +233,27 @@ public class RoomBookingPanel extends JPanel {
         pricePanel.setBackground(BG_COLOR);
         JLabel lblPriceValue = new JLabel("₱" + String.format("%,.0f", total));
         lblPriceValue.setFont(new Font("SansSerif", Font.BOLD, 22));
+        lblPriceValue.setForeground(AURELIA_GOLD);
         lblPriceValue.setHorizontalAlignment(SwingConstants.RIGHT);
 
         JButton btnBook = new JButton("BOOK NOW");
-        btnBook.setBackground(AURELIA_GOLD);
+        btnBook.setBackground(NAVY_BLUE);
         btnBook.setForeground(Color.WHITE);
         btnBook.setFocusPainted(false);
         btnBook.setFont(new Font("Arial", Font.BOLD, 12));
 
         btnBook.addActionListener(e -> {
-            this.selectedRoom = r;
-            long nightsCount = getSelectedNights();
-            double totalForThisRoom = (r.getPrice() + extra) * nightsCount;
-            this.currentTotal = totalForThisRoom;
-            this.cartItemCount = 1;
+            if (checkInCal == null || checkOutCal == null) {
+                JOptionPane.showMessageDialog(this, "Please select stay dates first!");
+                return;
+            }
 
-            lblCartItems.setText("Your Cart: " + cartItemCount + " Items");
-            lblCartTotal.setText("Total ₱" + String.format("%,.2f", currentTotal));
+            long n = getSelectedNights();
+            selectedRoomsList.add(new CartItem(r, checkInCal, checkOutCal, n));
 
-            JOptionPane.showMessageDialog(this, r.getType() + " selected for booking!");
+            updateCartUI();
+            JOptionPane.showMessageDialog(this, r.getType() + " added for " + n + " nights!");
         });
-
         pricePanel.add(lblPriceValue);
         pricePanel.add(btnBook);
 
@@ -248,6 +262,7 @@ public class RoomBookingPanel extends JPanel {
         row.add(pricePanel, BorderLayout.EAST);
         return row;
     }
+
     private String getAmenitiesByType(String type) {
         String roomType = (type == null) ? "" : type.trim();
         if (roomType.equalsIgnoreCase("Standard Room")) return "• 1 Queen Bed, • Hot and Cold Shower, • LED TV & High-Speed Wi-Fi";
@@ -258,36 +273,89 @@ public class RoomBookingPanel extends JPanel {
     }
 
     private JPanel createStatusHeader() {
-        JPanel p = new JPanel(new GridLayout(1, 3));
+        JPanel p = new JPanel(new GridLayout(1, 4));
         p.setBackground(BG_COLOR);
-        p.setBorder(BorderFactory.createLineBorder(new Color(220, 220, 220)));
+        p.setBorder(BorderFactory.createLineBorder(NAVY_BLUE));
         p.setMaximumSize(new Dimension(1600, 70));
         lblCheckIn = new JLabel("<html><b>Check-in</b><br>SELECT DATE</html>", SwingConstants.CENTER);
         lblCheckOut = new JLabel("<html><b>Check-out</b><br>SELECT DATE</html>", SwingConstants.CENTER);
-        lblGuestsValue = new JLabel("<html><b>Guests</b><br>" + currentGuestCount + " ADULTS</html>", SwingConstants.CENTER);
+        lblNightsHeader = new JLabel("<html><b>Nights</b><br>0</html>", SwingConstants.CENTER);
+        int totalAdultTypes = countAdults + countSeniors + countPWDs;
+        lblGuestsValue = new JLabel("<html><b>Guests</b><br>" + totalAdultTypes + " ADULTS, " + countChildren + " CHILD</html>", SwingConstants.CENTER);
+
+        lblCheckIn.setForeground(NAVY_BLUE);
+        lblCheckOut.setForeground(NAVY_BLUE);
+        lblNightsHeader.setForeground(NAVY_BLUE);
+        lblGuestsValue.setForeground(NAVY_BLUE);
+
         lblGuestsValue.setCursor(new Cursor(Cursor.HAND_CURSOR));
         lblGuestsValue.addMouseListener(new MouseAdapter() { public void mouseClicked(MouseEvent e) { showPaxPicker(lblGuestsValue); }});
-        p.add(lblGuestsValue); p.add(lblCheckIn); p.add(lblCheckOut);
+        p.add(lblGuestsValue); p.add(lblCheckIn); p.add(lblCheckOut); p.add(lblNightsHeader);
         return p;
     }
 
     private void showPaxPicker(JLabel parent) {
         JPopupMenu popup = new JPopupMenu();
-        JPanel panel = new JPanel(new FlowLayout());
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setBackground(BG_COLOR);
-        JButton m = new JButton("—"); JButton p = new JButton("+");
-        JLabel c = new JLabel(String.valueOf(currentGuestCount));
-        m.addActionListener(e -> { if(currentGuestCount > 1) { currentGuestCount--; c.setText(String.valueOf(currentGuestCount)); }});
-        p.addActionListener(e -> { if(currentGuestCount < 6) { currentGuestCount++; c.setText(String.valueOf(currentGuestCount)); }});
+        panel.setBorder(new EmptyBorder(10, 10, 10, 10));
+
+        panel.add(createPaxRow("Adults", countAdults, v -> countAdults = v, 1, 10));
+        panel.add(createPaxRow("Seniors", countSeniors, v -> countSeniors = v, 0, 10));
+        panel.add(createPaxRow("PWDs", countPWDs, v -> countPWDs = v, 0, 10));
+        panel.add(createPaxRow("Children", countChildren, v -> countChildren = v, 0, 10));
+
         JButton done = new JButton("DONE");
+        done.setBackground(NAVY_BLUE);
+        done.setForeground(Color.WHITE);
+        done.setAlignmentX(Component.CENTER_ALIGNMENT);
+
         done.addActionListener(e -> {
-            lblGuestsValue.setText("<html><b>Guests</b><br>" + currentGuestCount + " ADULTS</html>");
+            int totalAdults = countAdults + countSeniors + countPWDs;
+            String text = String.format("<html><b>Guests</b><br>%d ADULTS, %d CHILD</html>", totalAdults, countChildren);
+            lblGuestsValue.setText(text);
+
+            updateCartUI();
             loadRoomsByPackage();
             popup.setVisible(false);
         });
-        panel.add(new JLabel("Adults: ")); panel.add(m); panel.add(c); panel.add(p); panel.add(done);
+        panel.add(Box.createRigidArea(new Dimension(0, 10)));
+        panel.add(done);
         popup.add(panel);
         popup.show(parent, 0, parent.getHeight());
+    }
+
+    private JPanel createPaxRow(String label, int currentVal, java.util.function.Consumer<Integer> updater, int min, int max) {
+        JPanel row = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        row.setBackground(BG_COLOR);
+        JLabel lbl = new JLabel(label + ": ");
+        JButton m = new JButton("—");
+        JButton p = new JButton("+");
+        JLabel c = new JLabel(String.valueOf(currentVal));
+        c.setPreferredSize(new Dimension(20, 20));
+        c.setHorizontalAlignment(SwingConstants.CENTER);
+
+        m.addActionListener(e -> {
+            int val = Integer.parseInt(c.getText());
+            if (val > min) {
+                val--;
+                c.setText(String.valueOf(val));
+                updater.accept(val);
+            }
+        });
+
+        p.addActionListener(e -> {
+            int val = Integer.parseInt(c.getText());
+            if (val < max) {
+                val++;
+                c.setText(String.valueOf(val));
+                updater.accept(val);
+            }
+        });
+
+        row.add(lbl); row.add(m); row.add(c); row.add(p);
+        return row;
     }
 
     private long getSelectedNights() {
@@ -295,6 +363,55 @@ public class RoomBookingPanel extends JPanel {
         long diff = checkOutCal.getTimeInMillis() - checkInCal.getTimeInMillis();
         long n = TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS);
         return n <= 0 ? 1 : n;
+    }
+
+    private void handleCheckout() {
+        if (selectedRoomsList.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Your cart is empty!");
+            return;
+        }
+
+        int confirm = JOptionPane.showConfirmDialog(this,
+                "Confirm booking for " + selectedRoomsList.size() + " room(s)?",
+                "Aurelia Grand - Checkout", JOptionPane.YES_NO_OPTION);
+
+        if (confirm == JOptionPane.YES_OPTION) {
+            dao.BookingDB bookingDao = new dao.BookingDB();
+            boolean allSuccess = true;
+
+            String uniqueCartId = "CART-" + System.currentTimeMillis();
+
+            for (CartItem item : selectedRoomsList) {
+                int packageId = 1;
+                if (item.room.getPackageType().contains("Breakfast")) packageId = 2;
+                else if (item.room.getPackageType().contains("Amenities")) packageId = 3;
+
+                boolean success = bookingDao.finalizeBooking(
+                        item.room.getId(),
+                        this.loggedInGuestId,
+                        packageId,
+                        item.in,
+                        item.out,
+                        currentTotal,
+                        countAdults,
+                        countSeniors,
+                        countPWDs,
+                        countChildren,
+                        uniqueCartId
+                );
+                if (!success) allSuccess = false;
+            }
+
+            if (allSuccess) {
+                JOptionPane.showMessageDialog(this, "All rooms successfully reserved!");
+                selectedRoomsList.clear();
+                updateCartUI();
+                loadRoomsByPackage();
+                if (viewBookingsRef != null) viewBookingsRef.refreshData();
+            } else {
+                JOptionPane.showMessageDialog(this, "Booking failed. Please check your database connection.");
+            }
+        }
     }
 
     private void handleDateSelection(int day, int month) {
@@ -314,7 +431,7 @@ public class RoomBookingPanel extends JPanel {
 
     private JPanel createCalendarNavigation() {
         JPanel nav = new JPanel(new BorderLayout());
-        nav.setBackground(BG_COLOR);
+        nav.setBackground(NAVY_BLUE);
         nav.setMaximumSize(new Dimension(1600, 40));
         JButton b1 = new JButton("❮"); JButton b2 = new JButton("❯");
         b1.addActionListener(e -> { if(startMonthIndex > 0) { startMonthIndex--; updateCalendarDisplay(); }});
@@ -335,15 +452,16 @@ public class RoomBookingPanel extends JPanel {
 
     private JPanel renderMonth(int month) {
         JPanel p = new JPanel(new BorderLayout(0, 15));
-        p.setBackground(BG_COLOR);
+        p.setBackground(NAVY_BLUE);
 
         String[] months = {"JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"};
         JLabel title = new JLabel(months[month] + " 2026", SwingConstants.CENTER);
         title.setFont(new Font("Serif", Font.BOLD, 22));
+        title.setForeground(AURELIA_GOLD);
         p.add(title, BorderLayout.NORTH);
 
         JPanel grid = new JPanel(new GridLayout(0, 7, 5, 5));
-        grid.setBackground(BG_COLOR);
+        grid.setBackground(NAVY_BLUE);
 
         Calendar today = Calendar.getInstance();
         today.set(Calendar.HOUR_OF_DAY, 0);
@@ -369,7 +487,7 @@ public class RoomBookingPanel extends JPanel {
 
             if (cur.before(today)) {
                 b.setEnabled(false);
-                b.setBackground(new Color(245, 245, 245));
+                b.setBackground(new Color(60, 80, 100));
                 b.setForeground(Color.LIGHT_GRAY);
             } else {
                 if (checkInCal != null && cur.equals(checkInCal)) {
@@ -378,8 +496,13 @@ public class RoomBookingPanel extends JPanel {
                 } else if (checkOutCal != null && cur.equals(checkOutCal)) {
                     b.setBackground(AURELIA_GOLD);
                     b.setForeground(Color.WHITE);
+                } else if (checkInCal != null && checkOutCal != null && cur.after(checkInCal) && cur.before(checkOutCal)) {
+                    b.setBackground(new Color(197, 160, 89, 150));
+                    b.setForeground(Color.WHITE);
+                    b.setBorder(null);
                 } else {
                     b.setBackground(Color.WHITE);
+                    b.setForeground(NAVY_BLUE);
                     b.setBorder(BorderFactory.createLineBorder(new Color(200, 200, 200)));
                 }
 
@@ -392,93 +515,144 @@ public class RoomBookingPanel extends JPanel {
         p.add(grid, BorderLayout.CENTER);
         return p;
     }
+
     private void updateStatusLabels() {
         String in = (checkInCal == null) ? "SELECT DATE" : String.format("%tB %te, %tY", checkInCal, checkInCal, checkInCal);
         String out = (checkOutCal == null) ? "SELECT DATE" : String.format("%tB %te, %tY", checkOutCal, checkOutCal, checkOutCal);
-        lblCheckIn.setText("<html><b>Check-in</b><br>" + in.toUpperCase() + "</html>");
-        lblCheckOut.setText("<html><b>Check-out</b><br>" + out.toUpperCase() + "</html>");
+
+        lblCheckIn.setText("<html><center><b>Check-in</b><br>" + in.toUpperCase() + "</center></html>");
+        lblCheckOut.setText("<html><center><b>Check-out</b><br>" + out.toUpperCase() + "</center></html>");
+
+        if (lblNightsHeader != null) {
+            long nights = getSelectedNights();
+            if (checkInCal != null && checkOutCal != null) {
+                lblNightsHeader.setText("<html><center><b>Nights</b><br>" + nights + "</center></html>");
+            } else {
+                lblNightsHeader.setText("<html><center><b>Nights</b><br>0</center></html>");
+            }
+        }
     }
 
     private JPanel createFixedCart() {
         JPanel cart = new JPanel();
         cart.setLayout(new BoxLayout(cart, BoxLayout.Y_AXIS));
         cart.setPreferredSize(new Dimension(300, 0));
-        cart.setBackground(new Color(252, 252, 252));
+        cart.setBackground(NAVY_BLUE);
         cart.setBorder(new EmptyBorder(30, 20, 0, 20));
 
         lblCartItems = new JLabel("Your Cart: 0 Items");
-        lblCartItems.setFont(new Font("SansSerif", Font.BOLD, 16));
-        lblCartTotal = new JLabel("Total ₱0.00");
-        lblCartTotal.setFont(new Font("Serif", Font.BOLD, 22));
+        lblCartItems.setFont(new Font("SansSerif", Font.BOLD, 18));
+        lblCartItems.setForeground(AURELIA_GOLD);
+        lblCartItems.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        cart.add(lblCartItems);
-        cart.add(Box.createRigidArea(new Dimension(0, 10)));
-        cart.add(lblCartTotal);
+        txtCartList = new JTextArea(10, 20);
+        txtCartList.setEditable(false);
+        txtCartList.setLineWrap(true);
+        txtCartList.setWrapStyleWord(true);
+        txtCartList.setBackground(new Color(248, 248, 248));
+        txtCartList.setFont(new Font("SansSerif", Font.PLAIN, 13));
+        txtCartList.setMargin(new Insets(15, 15, 15, 15));
+        txtCartList.setText("No rooms selected.");
+
+        JScrollPane cartScroll = new JScrollPane(txtCartList);
+        cartScroll.setBorder(BorderFactory.createLineBorder(AURELIA_GOLD, 1));
+        cartScroll.setMaximumSize(new Dimension(260, 250));
+        cartScroll.setAlignmentX(Component.LEFT_ALIGNMENT);
+        cartScroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
+        cartScroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+
+        lblCartTotal = new JLabel("Total ₱0.00");
+        lblCartTotal.setFont(new Font("Serif", Font.BOLD, 24));
+        lblCartTotal.setForeground(Color.WHITE);
+        lblCartTotal.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        JButton clearCartBtn = new JButton("CLEAR CART");
+        clearCartBtn.setMaximumSize(new Dimension(260, 35));
+        clearCartBtn.setBackground(AURELIA_GOLD);
+        clearCartBtn.setForeground(Color.WHITE);
+        clearCartBtn.setFocusPainted(false);
+        clearCartBtn.setBorderPainted(false);
+        clearCartBtn.setFont(new Font("Arial", Font.BOLD, 12));
+        clearCartBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        clearCartBtn.setAlignmentX(Component.LEFT_ALIGNMENT);
+        clearCartBtn.addActionListener(e -> {
+            selectedRoomsList.clear();
+            updateCartUI();
+        });
 
         JButton checkOut = new JButton("CHECKOUT");
         checkOut.setMaximumSize(new Dimension(260, 50));
-        checkOut.setBackground(new Color(40, 40, 40));
+        checkOut.setBackground(Color.BLACK);
         checkOut.setForeground(Color.WHITE);
+        checkOut.setFocusPainted(false);
+        checkOut.setFont(new Font("Arial", Font.BOLD, 14));
+        checkOut.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        checkOut.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        checkOut.addActionListener(e -> {
-            // 1. UI VALIDATION CHECKS
-            if (selectedRoom == null) {
-                JOptionPane.showMessageDialog(this, "Please select a room first!");
-                return;
-            }
-            if (checkInCal == null || checkOutCal == null) {
-                JOptionPane.showMessageDialog(this, "Please select your stay dates!");
-                return;
-            }
+        checkOut.addActionListener(e -> handleCheckout());
 
-            int confirm = JOptionPane.showConfirmDialog(this,
-                    "Confirm reservation for " + selectedRoom.getType() + " (Room " + selectedRoom.getRoomNumber() + ")?",
-                    "Confirm Booking", JOptionPane.YES_NO_OPTION);
-
-            if (confirm == JOptionPane.YES_OPTION) {
-
-                if (this.loggedInGuestId <= 0) {
-                    JOptionPane.showMessageDialog(this, "No valid guest session found. Please re-login.");
-                    return;
-                }
-
-                dao.BookingDB bookingDao = new dao.BookingDB();
-
-                int packageId = 1;
-                if (selectedRoom.getPackageType().contains("Breakfast")) packageId = 2;
-                else if (selectedRoom.getPackageType().contains("Amenities")) packageId = 3;
-
-                boolean success = bookingDao.finalizeBooking(
-                        selectedRoom.getId(),
-                        this.loggedInGuestId,
-                        packageId,
-                        checkInCal,
-                        checkOutCal,
-                        currentTotal
-                );
-
-                if (success) {
-                    JOptionPane.showMessageDialog(this, "Success! Your room is now reserved.");
-
-                    selectedRoom = null;
-                    currentTotal = 0.0;
-                    cartItemCount = 0;
-
-                    lblCartItems.setText("Your Cart: 0 Items");
-                    lblCartTotal.setText("Total ₱0.00");
-
-                    loadRoomsByPackage();
-
-                    if (viewBookingsRef != null) {
-                        viewBookingsRef.refreshData();
-                    }
-                } else {
-                    JOptionPane.showMessageDialog(this, "Booking failed. The room may have been taken or dates overlap.");
-                }
-            }
-        });
-
-        cart.add(Box.createRigidArea(new Dimension(0, 40)));
+        cart.add(lblCartItems);
+        cart.add(Box.createRigidArea(new Dimension(0, 15)));
+        cart.add(cartScroll);
+        cart.add(Box.createRigidArea(new Dimension(0, 20)));
+        cart.add(lblCartTotal);
+        cart.add(Box.createRigidArea(new Dimension(0, 30)));
+        cart.add(clearCartBtn);
+        cart.add(Box.createRigidArea(new Dimension(0, 10)));
         cart.add(checkOut);
+
         return cart;
-    }}
+    }
+
+    private void updateCartUI() {
+        StringBuilder listBuilder = new StringBuilder();
+        double totalBeforeDiscount = 0;
+        double childFeePerNight = 250.0;
+
+        for (CartItem item : selectedRoomsList) {
+            listBuilder.append(item.room.getType().toUpperCase()).append("\n");
+            listBuilder.append(item.room.getPackageType()).append("\n");
+            String dateRange = String.format("%tb %te - %tb %te, %tY",
+                    item.in, item.in, item.out, item.out, item.out);
+            listBuilder.append(dateRange).append("\n");
+            listBuilder.append(item.nights).append(item.nights > 1 ? " Nights stay" : " Night stay").append("\n");
+            listBuilder.append("----------------------------\n");
+            double extra = 0;
+            String pkg = item.room.getPackageType();
+            if (pkg != null) {
+                if (pkg.contains("Breakfast")) extra = 500.0;
+                else if (pkg.contains("Amenities")) extra = 1000.0;
+            }
+            totalBeforeDiscount += (item.room.getPrice() + extra) * item.nights;
+            totalBeforeDiscount += (countChildren * childFeePerNight * item.nights);
+        }
+
+        if (txtCartList != null) {
+            txtCartList.setText(selectedRoomsList.isEmpty() ? "No rooms selected." : listBuilder.toString());
+        }
+
+        double totalGuestShare = countAdults + countSeniors + countPWDs;
+        double seniorDiscount = 0;
+        if (totalGuestShare > 0) {
+            seniorDiscount = (totalBeforeDiscount / totalGuestShare) * (countSeniors + countPWDs) * 0.20;
+        }
+
+        this.currentTotal = totalBeforeDiscount - seniorDiscount;
+        lblCartItems.setText("Your Cart: " + selectedRoomsList.size() + " Items");
+        lblCartTotal.setText("Total ₱" + String.format("%,.2f", currentTotal));
+    }
+
+    private static class CartItem {
+        Room room;
+        Calendar in;
+        Calendar out;
+        long nights;
+
+        CartItem(Room r, Calendar in, Calendar out, long n) {
+            this.room = r;
+            this.in = (Calendar) in.clone();
+            this.out = (Calendar) out.clone();
+            this.nights = n;
+        }
+    }
+}

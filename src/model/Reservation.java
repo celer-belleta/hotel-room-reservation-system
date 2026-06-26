@@ -13,7 +13,13 @@ public class Reservation {
     private double totalAmount;
     private double amountPaid;
 
-    private double remainingBalance;
+    private String managedBy;
+
+    private String timeIn;
+    private String timeOut;
+
+    private double damageFee;
+    private double damagePaid;
 
     public Reservation(int resId, int guestId, int roomId, Date checkIn, Date checkOut, String status, int packageId) {
         this.resId = resId;
@@ -64,10 +70,37 @@ public class Reservation {
 
     //
     public double getRemainingBalance() {
-        return remainingBalance;
+        return (totalAmount + damageFee) - (amountPaid + damagePaid);
     }
 
-    public void setRemainingBalance(double remainingBalance) {
-        this.remainingBalance = remainingBalance;
+    //
+    public String getManagedBy() { return managedBy; }
+    public void setManagedBy(String managedBy) { this.managedBy = managedBy; }
+
+    //
+    public String getTimeIn() { return timeIn; }
+    public void setTimeIn(String timeIn) { this.timeIn = timeIn; }
+
+    public String getTimeOut() { return timeOut; }
+    public void setTimeOut(String timeOut) { this.timeOut = timeOut; }
+
+    //
+    public double getDamageFee() { return damageFee; }
+    public void setDamageFee(double damageFee) { this.damageFee = damageFee; }
+    public double getDamagePaid() { return damagePaid; }
+    public void setDamagePaid(double damagePaid) { this.damagePaid = damagePaid; }
+
+    //
+    public long getNights() {
+        if (checkIn == null || checkOut == null) return 0;
+
+        // Calculate the difference in milliseconds
+        long diff = checkOut.getTime() - checkIn.getTime();
+
+        // Convert to days
+        long nights = java.util.concurrent.TimeUnit.DAYS.convert(diff, java.util.concurrent.TimeUnit.MILLISECONDS);
+
+        // If the guest stays for a few hours or the same day, it counts as 1 night
+        return (nights <= 0) ? 1 : nights;
     }
 }

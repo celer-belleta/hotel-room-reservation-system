@@ -9,6 +9,7 @@ public class User {
     private String password;
     private String role;
 
+    public User() {}
     public User(int id, String firstName, String lastName, String username, String password, String role) {
         this.id = id;
         this.firstName = firstName;
@@ -35,6 +36,9 @@ public class User {
     }
 
     // SETTERS
+    public void setId(int id) { this.id = id; }
+    public void setFirstName(String firstName) { this.firstName = firstName; }
+    public void setLastName(String lastName) { this.lastName = lastName; }
     public void setUsername(String username) { this.username = username; }
     public void setPassword(String password) { this.password = password; }
     public void setRole(String role) { this.role = role; }

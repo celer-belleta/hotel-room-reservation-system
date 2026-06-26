@@ -30,10 +30,9 @@ public class ClerkDashboard extends JFrame {
         mainContent = new JPanel(cardLayout);
         mainContent.setBackground(Color.WHITE);
 
-        mainContent.add(new AdminSummaryPanel(), "DASHBOARD");
         mainContent.add(new GuestTablePanel(), "GUEST_LIST");
         mainContent.add(new RoomTablePanel("Clerk"), "ROOM_LIST");
-        mainContent.add(new ReservationTablePanel(), "RESERVATIONS");
+        mainContent.add(new ReservationTablePanel(this), "RESERVATIONS");
 
         rightContainer.add(mainContent, BorderLayout.CENTER);
         add(rightContainer, BorderLayout.CENTER);
@@ -44,6 +43,7 @@ public class ClerkDashboard extends JFrame {
 
     public void showPage(String cardName) {
         if (cardName.equals("LOGOUT")) {
+            ui.Session.logout();
             dispose();
             new MainFrame().setVisible(true);
         } else {

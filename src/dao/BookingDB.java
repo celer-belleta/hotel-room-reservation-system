@@ -7,73 +7,66 @@ import java.util.Calendar;
 
 public class BookingDB {
 
-    public boolean finalizeBooking(int roomId, int guestId, int packageId, Calendar checkIn, Calendar checkOut, double totalAmount) {
-        ReservationDB resChecker = new ReservationDB();
-        Date sqlIn = new java.sql.Date(checkIn.getTimeInMillis());
-        Date sqlOut = new java.sql.Date(checkOut.getTimeInMillis());
+    public boolean finalizeBooking(int roomId, int guestId, int packageId,
+                                   java.util.Calendar checkIn, java.util.Calendar checkOut,
+                                   double total, int adults, int seniors, int pwds, int children,
+                                   String cartId) {
 
-        if (!resChecker.isRoomAvailable(roomId, sqlIn, sqlOut)) {
-            return false;
-        }
+        String sql = "INSERT INTO reservations (room_id, guest_id, package_id, check_in, check_out, " +
+                "total_amount, status, adults, seniors, pwds, children, cart_id, handled_by_id) " +
+                "VALUES (?, ?, ?, ?, ?, ?, 'Pending', ?, ?, ?, ?, ?, ?)";
 
-        String reserveSql = "INSERT INTO reservations (room_id, guest_id, check_in, check_out, package_id, total_amount, amount_paid, remaining_balance, status) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'Pending')";
+        try (java.sql.Connection conn = db.DBConnection.getConnection();
+             java.sql.PreparedStatement ps = conn.prepareStatement(sql)) {
 
-        String updateRoomSql = "UPDATE rooms SET status = 'Booked' WHERE id = ?";
+            ps.setInt(1, roomId);
+            ps.setInt(2, guestId);
+            ps.setInt(3, packageId);
+            ps.setDate(4, new java.sql.Date(checkIn.getTimeInMillis()));
+            ps.setDate(5, new java.sql.Date(checkOut.getTimeInMillis()));
+            ps.setDouble(6, total);
+            ps.setInt(7, adults);
+            ps.setInt(8, seniors);
+            ps.setInt(9, pwds);
+            ps.setInt(10, children);
+            ps.setString(11, cartId);
 
-        try (Connection conn = db.DBConnection.getConnection()) {
-            conn.setAutoCommit(false);
-
-            try (PreparedStatement ps = conn.prepareStatement(reserveSql)) {
-                ps.setInt(1, roomId);          // room_id
-                ps.setInt(2, guestId);         // guest_id
-                ps.setDate(3, sqlIn);          // check_in
-                ps.setDate(4, sqlOut);         // check_out
-                ps.setInt(5, packageId);       // package_id
-                ps.setDouble(6, totalAmount);  // total_amount
-                ps.setDouble(7, 0.00);         // amount_paid (initial state is 0.00)
-                ps.setDouble(8, totalAmount);  // remaining_balance (initial state is full total)
-
-                ps.executeUpdate();
+            model.User sessionUser = ui.Session.getCurrentUser();
+            if (sessionUser != null && sessionUser.getId() != guestId) {
+                ps.setInt(12, sessionUser.getId());
+            } else {
+                ps.setNull(12, java.sql.Types.INTEGER);
             }
 
-            try (PreparedStatement ps = conn.prepareStatement(updateRoomSql)) {
-                ps.setInt(1, roomId);
-                ps.executeUpdate();
-            }
-
-            conn.commit();
-            return true;
-
-        } catch (SQLException e) {
+            return ps.executeUpdate() > 0;
+        } catch (java.sql.SQLException e) {
             e.printStackTrace();
             return false;
         }
     }
-    public boolean payReservationDeposit(int resId, double amount, String method) {
-        String updateRes = "UPDATE reservations SET amount_paid = ?, remaining_balance = total_amount - ?, status = 'Pending' WHERE res_id = ?";
 
-        String insertPay = "INSERT INTO payments (res_id, amount_paid, total_amount_due, discount_amount, payment_method, payment_type, invoice_number, payment_date) " +
-                "VALUES (?, ?, ?, 0.0, ?, 'Downpayment', ?, NOW())";
+    public boolean payReservationDeposit(int resId, double amount, String method) {
+        String findCartSql = "SELECT cart_id FROM reservations WHERE res_id = ?";
+
+        String updateAllRes = "UPDATE reservations SET amount_paid = total_amount * 0.20, " +
+                "remaining_balance = total_amount * 0.80, " +
+                "status = 'Reserved' WHERE cart_id = (SELECT cart_id FROM (SELECT cart_id FROM reservations WHERE res_id = ?) AS tmp)";
 
         try (Connection conn = db.DBConnection.getConnection()) {
             conn.setAutoCommit(false);
+            try (PreparedStatement psUpdate = conn.prepareStatement(updateAllRes)) {
+                psUpdate.setInt(1, resId);
+                psUpdate.executeUpdate();
 
-            try (PreparedStatement ps1 = conn.prepareStatement(updateRes);
-                 PreparedStatement ps2 = conn.prepareStatement(insertPay)) {
-
-                ps1.setDouble(1, amount);
-                ps1.setDouble(2, amount);
-                ps1.setInt(3, resId);
-                ps1.executeUpdate();
-
-                ps2.setInt(1, resId);
-                ps2.setDouble(2, amount);
-                ps2.setDouble(3, amount);
-                ps2.setString(4, method);
-                ps2.setString(5, "INV-" + resId + "-" + System.currentTimeMillis() % 1000);
-
-                ps2.executeUpdate();
+                String insertPay = "INSERT INTO payments (res_id, amount_paid, total_amount_due, payment_method, payment_type, invoice_number, payment_date) " +
+                        "VALUES (?, ?, ?, 'Cart Payment', 'Downpayment', ?, NOW())";
+                try (PreparedStatement psPay = conn.prepareStatement(insertPay)) {
+                    psPay.setInt(1, resId);
+                    psPay.setDouble(2, amount);
+                    psPay.setDouble(3, amount);
+                    psPay.setString(4, "INV-CART-" + System.currentTimeMillis() % 1000);
+                    psPay.executeUpdate();
+                }
 
                 conn.commit();
                 return true;

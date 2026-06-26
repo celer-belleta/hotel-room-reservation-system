@@ -22,13 +22,11 @@ public class PaymentDB {
     public boolean processPayment(int resId, double amountPaid, double totalDue, double discount, String method, String type, String invoice) {
         String sqlInsert = "INSERT INTO payments (res_id, amount_paid, total_amount_due, discount_amount, payment_method, payment_type, invoice_number) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
-        // FIXED: Subtracts BOTH the cash payment and the discount from the remaining_balance[cite: 12]
         String sqlUpdate = "UPDATE reservations SET amount_paid = amount_paid + ?, remaining_balance = remaining_balance - (? + ?) WHERE res_id = ?";
 
         try (Connection conn = db.DBConnection.getConnection()) {
-            conn.setAutoCommit(false); // Start transaction for data safety[cite: 12]
+            conn.setAutoCommit(false); // Start transaction for data safety
 
-            // 1. Record the payment details in the payments table[cite: 12]
             try (PreparedStatement ps1 = conn.prepareStatement(sqlInsert)) {
                 ps1.setInt(1, resId);
                 ps1.setDouble(2, amountPaid);
@@ -40,11 +38,10 @@ public class PaymentDB {
                 ps1.executeUpdate();
             }
 
-            // 2. Update the reservation totals and balance[cite: 12]
             try (PreparedStatement ps2 = conn.prepareStatement(sqlUpdate)) {
-                ps2.setDouble(1, amountPaid); // Add to the 'amount_paid' running total[cite: 12]
-                ps2.setDouble(2, amountPaid); // Deduct cash from 'remaining_balance'[cite: 12]
-                ps2.setDouble(3, discount);   // Deduct discount from 'remaining_balance'[cite: 12]
+                ps2.setDouble(1, amountPaid); // Add to the 'amount_paid' running total
+                ps2.setDouble(2, amountPaid); // Deduct cash from 'remaining_balance'
+                ps2.setDouble(3, discount);   // Deduct discount from 'remaining_balance'
                 ps2.setInt(4, resId);
                 ps2.executeUpdate();
             }
@@ -97,4 +94,22 @@ public class PaymentDB {
 
         return discountAmount;
     }
-}
+
+    public String getDownpaymentDate(int resId) {
+        String sql = "SELECT created_at FROM reservations WHERE res_id = ? LIMIT 1";
+        try (Connection conn = db.DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, resId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    java.sql.Timestamp ts = rs.getTimestamp("created_at");
+                    if (ts != null) {
+                        return new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm").format(ts);
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return "N/A";
+    }}

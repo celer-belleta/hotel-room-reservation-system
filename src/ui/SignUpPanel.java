@@ -3,6 +3,8 @@ package ui;
 import dao.GuestDB;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class SignUpPanel extends JPanel {
     private JTextField txtFirstName = new JTextField(20);
@@ -13,34 +15,40 @@ public class SignUpPanel extends JPanel {
     private JPasswordField txtPassword = new JPasswordField(20);
     private JTextField txtContact = new JTextField(20);
     private JTextField txtIdNum = new JTextField(20);
-    private JButton btnSubmit = new JButton("Sign Up");
+    private JButton btnSubmit = new JButton("SIGN UP");
 
     private MainFrame mainFrame;
+    private final Color MATCHED_NAVY = new Color(44, 62, 80);
+    private final Color GOLD = new Color(197, 160, 89);
 
     public SignUpPanel(MainFrame mainFrame) {
         this.mainFrame = mainFrame;
-        setBackground(Color.WHITE);
+
+        setBackground(MATCHED_NAVY);
         setLayout(new GridBagLayout());
 
         JPanel contentWrap = new JPanel(new GridBagLayout());
         contentWrap.setBackground(Color.WHITE);
-        contentWrap.setBorder(BorderFactory.createLineBorder(Color.GRAY, 1));
+        contentWrap.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));
+        contentWrap.setPreferredSize(new Dimension(550, 700));
 
         GridBagConstraints wrapGbc = new GridBagConstraints();
         wrapGbc.insets = new Insets(5, 15, 5, 15);
         wrapGbc.fill = GridBagConstraints.NONE;
 
         // HEADER
-        JLabel lblTitle = new JLabel("Guest Sign Up", SwingConstants.CENTER);
+        JLabel lblTitle = new JLabel("GUEST SIGN UP", SwingConstants.CENTER);
         lblTitle.setFont(new Font("Arial", Font.BOLD, 28));
+        lblTitle.setForeground(MATCHED_NAVY);
         wrapGbc.gridy = 0; wrapGbc.gridx = 0; wrapGbc.gridwidth = 2;
         wrapGbc.anchor = GridBagConstraints.CENTER;
-        wrapGbc.insets = new Insets(20, 15, 20, 15);
+        wrapGbc.insets = new Insets(20, 15, 25, 15);
         contentWrap.add(lblTitle, wrapGbc);
 
         wrapGbc.insets = new Insets(5, 15, 5, 15);
         wrapGbc.gridwidth = 1;
 
+        // FORM FIELDS
         addLabelAndField("First Name:", txtFirstName, 1, wrapGbc, contentWrap);
         addLabelAndField("Last Name:", txtLastName, 2, wrapGbc, contentWrap);
         addLabelAndField("Contact:", txtContact, 3, wrapGbc, contentWrap);
@@ -54,20 +62,24 @@ public class SignUpPanel extends JPanel {
         wrapGbc.gridx = 0;
         wrapGbc.gridwidth = 2;
         wrapGbc.anchor = GridBagConstraints.CENTER;
-        wrapGbc.insets = new Insets(15, 15, 5, 15);
+        wrapGbc.insets = new Insets(25, 15, 5, 15);
+
         btnSubmit.setFont(new Font("Arial", Font.BOLD, 18));
+        btnSubmit.setBackground(MATCHED_NAVY);
+        btnSubmit.setForeground(Color.WHITE);
+        btnSubmit.setOpaque(true);
+        btnSubmit.setBorderPainted(false);
         btnSubmit.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btnSubmit.setPreferredSize(new Dimension(200, 40));
+        btnSubmit.setPreferredSize(new Dimension(220, 45));
         contentWrap.add(btnSubmit, wrapGbc);
 
         // BACK TO LOGIN LINK
         JLabel lblBack = new JLabel("Already have an account? Login here", SwingConstants.CENTER);
         lblBack.setFont(new Font("Arial", Font.PLAIN, 14));
+        lblBack.setForeground(Color.BLACK);
         lblBack.setCursor(new Cursor(Cursor.HAND_CURSOR));
         wrapGbc.gridy = 9;
-        wrapGbc.gridx = 0;
-        wrapGbc.gridwidth = 2;
-        wrapGbc.insets = new Insets(5, 15, 20, 15);
+        wrapGbc.insets = new Insets(10, 15, 20, 15);
         contentWrap.add(lblBack, wrapGbc);
 
         add(contentWrap);
@@ -88,7 +100,6 @@ public class SignUpPanel extends JPanel {
             }
 
             GuestDB guestDB = new GuestDB();
-
             if (guestDB.addGuest(fName, lName, contact, idType, idNum, user, pass)) {
                 JOptionPane.showMessageDialog(this, "Success! Your guest account is created.");
                 mainFrame.showCard("LOGIN_PAGE");
@@ -98,10 +109,18 @@ public class SignUpPanel extends JPanel {
             }
         });
 
-        lblBack.addMouseListener(new java.awt.event.MouseAdapter() {
+        lblBack.addMouseListener(new MouseAdapter() {
             @Override
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
+            public void mouseClicked(MouseEvent evt) {
                 mainFrame.showCard("LOGIN_PAGE");
+            }
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                lblBack.setForeground(Color.BLACK);
+            }
+            @Override
+            public void mouseExited(MouseEvent e) {
+                lblBack.setForeground(Color.BLACK);
             }
         });
     }
@@ -121,11 +140,11 @@ public class SignUpPanel extends JPanel {
         gbc.gridwidth = 1;
 
         JLabel label = new JLabel(labelText);
-        label.setFont(new Font("Arial", Font.BOLD, 18));
+        label.setFont(new Font("Arial", Font.BOLD, 16));
 
         gbc.gridx = 0;
         gbc.anchor = GridBagConstraints.LINE_END;
-        gbc.weightx = 0.1; // Give a small weight to help alignment
+        gbc.weightx = 0.1;
         gbc.insets = new Insets(5, 20, 5, 10);
         container.add(label, gbc);
 
@@ -134,12 +153,10 @@ public class SignUpPanel extends JPanel {
         gbc.weightx = 1.0;
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        Dimension fieldSize = new Dimension(250, 30);
-        field.setPreferredSize(fieldSize);
-        field.setMinimumSize(fieldSize);
-
+        field.setPreferredSize(new Dimension(250, 30));
         gbc.insets = new Insets(5, 0, 5, 20);
         container.add(field, gbc);
 
         gbc.fill = GridBagConstraints.NONE;
-    }}
+    }
+}

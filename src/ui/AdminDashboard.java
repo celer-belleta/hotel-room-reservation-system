@@ -34,20 +34,18 @@ public class AdminDashboard extends JFrame {
         mainContent = new JPanel(cardLayout);
         mainContent.setBackground(Color.WHITE);
 
-        // Adding pages
         mainContent.add(new AdminSummaryPanel(), "DASHBOARD");
         mainContent.add(new UserTablePanel(), "USER_LIST");
         mainContent.add(new GuestTablePanel(), "GUEST_LIST");
         mainContent.add(new RoomTablePanel("Admin"), "ROOM_LIST");
         // mainContent.add(new PackageTablePanel(), "AMENITIES");
-        mainContent.add(new ReservationTablePanel(), "RESERVATIONS");
+        mainContent.add(new ReservationTablePanel(this), "RESERVATIONS");
         mainContent.add(new RevenueReportPanel(), "REVENUE_REPORT");
         mainContent.add(new OccupancyReportPanel(), "OCCUPANCY_REPORT");
 
         rightContainer.add(mainContent, BorderLayout.CENTER);
         add(rightContainer, BorderLayout.CENTER);
 
-        // Show Dashboard Summary by default
         cardLayout.show(mainContent, "DASHBOARD");
 
         setVisible(true);
@@ -62,6 +60,7 @@ public class AdminDashboard extends JFrame {
 
     public void showPage(String cardName) {
         if (cardName.equals("LOGOUT")) {
+            ui.Session.logout();
             dispose();
             new MainFrame().setVisible(true);
         } else if (cardName.equals("DASHBOARD")) {

@@ -5,90 +5,131 @@ import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.util.Calendar;
 
 public class PaymentProcessingFrame extends JFrame {
     private final Color BG_COLOR = new Color(245, 246, 247);
     private double remainingBalance;
-    private JTextField txtCash;
-    private JTextField txtPromo;
-    private JLabel lblChange;
-    private JLabel lblBalValue;
+    private final JTextField txtCash;
+    private final JTextField txtPromo;
+    private final JLabel lblChange;
+    private final JLabel lblBalValue;
 
-    private String guestName;
-    private int guestId;
-    private double totalAmount;
-    private double depositPaid;
+    private final String guestName;
+    private final int guestId;
+    private final double totalAmount;
+    private final double depositPaid;
 
-    public PaymentProcessingFrame(int resId, String guestName, int guestId, double total, double paid, ReservationTablePanel parent) {
-        this.remainingBalance = total - paid;
+
+    public PaymentProcessingFrame(int resId, String guestName, int guestId, double total, double paid,
+                                  ReservationTablePanel parent) {
         this.guestName = guestName;
         this.guestId = guestId;
         this.totalAmount = total;
         this.depositPaid = paid;
+        this.remainingBalance = total - paid;
+
+        this.lblBalValue = new JLabel();
+        this.lblChange = new JLabel("₱0.00");
+        this.txtCash = new JTextField();
+        this.txtPromo = new JTextField();
 
         setTitle("Payment Processing - Reservation #" + resId);
-        setSize(400, 520);
+        setSize(400, 600); // Increased height slightly to fit new info
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
         getContentPane().setBackground(BG_COLOR);
 
-        JPanel topPanel = new JPanel(new GridLayout(3, 2, 10, 10));
+        // VAT CALCULATIONS
+        double vatRate = 0.12;
+        double vatableSales = totalAmount / (1 + vatRate);
+        double vatAmount = totalAmount - vatableSales;
+
+        // Changed GridLayout from 3 to 4 to accommodate VAT row
+        JPanel topPanel = new JPanel(new GridLayout(4, 1, 0, 8));
         topPanel.setBackground(Color.WHITE);
         topPanel.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createMatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY),
-                new EmptyBorder(25, 25, 25, 25)
+                new EmptyBorder(25, 40, 25, 40)
         ));
 
-        topPanel.add(new JLabel("Total Amount:"));
-        topPanel.add(new JLabel("₱" + String.format("%,.2f", total)));
-        topPanel.add(new JLabel("Downpayment Paid:"));
-        topPanel.add(new JLabel("₱" + String.format("%,.2f", paid)));
+        JPanel row1 = new JPanel(new BorderLayout());
+        row1.setOpaque(false);
+        row1.add(new JLabel("Total Amount Due:"), BorderLayout.WEST);
+        row1.add(new JLabel("₱" + String.format("%,.2f", totalAmount)), BorderLayout.EAST);
 
-        JLabel lblBalTitle = new JLabel("TOTAL TO PAY:");
-        lblBalTitle.setFont(new Font("SansSerif", Font.BOLD, 13));
-        topPanel.add(lblBalTitle);
+        JPanel row2 = new JPanel(new BorderLayout());
+        row2.setOpaque(false);
+        row2.add(new JLabel("Downpayment Paid:"), BorderLayout.WEST);
+        row2.add(new JLabel("₱" + String.format("%,.2f", depositPaid)), BorderLayout.EAST);
 
-        lblBalValue = new JLabel("₱" + String.format("%,.2f", remainingBalance));
-        lblBalValue.setFont(new Font("SansSerif", Font.BOLD, 15));
-        topPanel.add(lblBalValue);
+        // NEW: VAT BREAKDOWN ROW
+        JPanel rowVat = new JPanel(new BorderLayout());
+        rowVat.setOpaque(false);
+        JLabel lblVatInfo = new JLabel("Inclusive of 12% VAT:");
+        lblVatInfo.setFont(new Font("SansSerif", Font.BOLD, 12));
+        lblVatInfo.setForeground(Color.BLACK);
+        rowVat.add(lblVatInfo, BorderLayout.WEST);
+
+        JLabel lblVatValue = new JLabel("₱" + String.format("%,.2f", vatAmount));
+        lblVatValue.setFont(new Font("SansSerif", Font.BOLD, 12));
+        lblVatValue.setForeground(Color.BLACK);
+        rowVat.add(lblVatValue, BorderLayout.EAST);
+
+        JPanel row3 = new JPanel(new BorderLayout());
+        row3.setOpaque(false);
+        JLabel lblBalTitle = new JLabel("OUTSTANDING BALANCE:");
+        lblBalTitle.setFont(new Font("SansSerif", Font.BOLD, 12));
+        row3.add(lblBalTitle, BorderLayout.WEST);
+
+        lblBalValue.setText("₱" + String.format("%,.2f", remainingBalance));
+        lblBalValue.setFont(new Font("SansSerif", Font.BOLD, 18));
+        lblBalValue.setForeground(new Color(180, 0, 0));
+        row3.add(lblBalValue, BorderLayout.EAST);
+
+        topPanel.add(row1);
+        topPanel.add(row2);
+        topPanel.add(rowVat); // Added the new VAT row
+        topPanel.add(row3);
         add(topPanel, BorderLayout.NORTH);
 
         JPanel centerPanel = new JPanel(null);
         centerPanel.setOpaque(false);
 
-        JLabel lblCashLabel = new JLabel("Cash Received:");
-        lblCashLabel.setBounds(40, 30, 200, 25);
+        JLabel lblCashLabel = new JLabel("ENTER CASH RECEIVED:");
+        lblCashLabel.setFont(new Font("SansSerif", Font.BOLD, 11));
+        lblCashLabel.setBounds(40, 20, 200, 20);
         centerPanel.add(lblCashLabel);
 
-        txtCash = new JTextField();
-        txtCash.setBounds(40, 60, 300, 45);
-        txtCash.setFont(new Font("SansSerif", Font.BOLD, 20));
-        txtCash.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(Color.GRAY),
-                BorderFactory.createEmptyBorder(5, 10, 5, 10)
-        ));
+        txtCash.setBounds(40, 45, 310, 50); // Adjusted width to fit margin
+        txtCash.setFont(new Font("SansSerif", Font.BOLD, 22));
+        txtCash.setHorizontalAlignment(JTextField.CENTER);
+        txtCash.setBorder(BorderFactory.createLineBorder(Color.GRAY));
         centerPanel.add(txtCash);
 
-        JLabel lblPromoLabel = new JLabel("Promo Code:");
-        lblPromoLabel.setBounds(40, 210, 150, 25);
-        centerPanel.add(lblPromoLabel);
-
-        txtPromo = new JTextField();
-        txtPromo.setBounds(40, 240, 200, 40);
-        centerPanel.add(txtPromo);
-
-        JButton btnApplyPromo = new JButton("Apply");
-        btnApplyPromo.setBounds(250, 240, 70, 40);
-        centerPanel.add(btnApplyPromo);
-
-        JLabel lblChangeTitle = new JLabel("Change:");
-        lblChangeTitle.setBounds(40, 125, 100, 25);
+        JLabel lblChangeTitle = new JLabel("CHANGE DUE:");
+        lblChangeTitle.setFont(new Font("SansSerif", Font.BOLD, 11));
+        lblChangeTitle.setBounds(40, 110, 100, 20);
         centerPanel.add(lblChangeTitle);
 
-        lblChange = new JLabel("₱0.00");
-        lblChange.setFont(new Font("SansSerif", Font.BOLD, 24));
-        lblChange.setBounds(40, 155, 300, 35);
+        lblChange.setBounds(40, 135, 310, 40);
+        lblChange.setFont(new Font("SansSerif", Font.BOLD, 32));
+        lblChange.setHorizontalAlignment(SwingConstants.CENTER);
         centerPanel.add(lblChange);
+
+        JLabel lblPromoLabel = new JLabel("PROMO CODE:");
+        lblPromoLabel.setFont(new Font("SansSerif", Font.BOLD, 11));
+        lblPromoLabel.setBounds(40, 200, 100, 20);
+        centerPanel.add(lblPromoLabel);
+
+        txtPromo.setBounds(40, 225, 200, 35);
+        centerPanel.add(txtPromo);
+
+        JButton btnApplyPromo = new JButton("APPLY");
+        btnApplyPromo.setBounds(255, 225, 95, 35);
+        btnApplyPromo.setFocusPainted(false);
+        centerPanel.add(btnApplyPromo);
+
         add(centerPanel, BorderLayout.CENTER);
 
         txtCash.addKeyListener(new KeyAdapter() {
@@ -100,6 +141,8 @@ public class PaymentProcessingFrame extends JFrame {
 
         JButton btnConfirm = new JButton("Confirm Payment & Print Receipt");
         btnConfirm.setPreferredSize(new Dimension(0, 60));
+        btnConfirm.setBackground(new Color(40, 40, 40));
+        btnConfirm.setForeground(Color.WHITE);
         btnConfirm.setFont(new Font("SansSerif", Font.BOLD, 14));
         btnConfirm.addActionListener(e -> handleConfirmation(resId, parent));
         add(btnConfirm, BorderLayout.SOUTH);
@@ -114,6 +157,7 @@ public class PaymentProcessingFrame extends JFrame {
                 JOptionPane.showMessageDialog(this, String.format("Discount of ₱%,.2f applied!", discount));
                 btnApplyPromo.setEnabled(false);
                 txtPromo.setEditable(false);
+                calculateChange();
             } else {
                 JOptionPane.showMessageDialog(this, "Invalid Promo Code.");
             }
@@ -137,7 +181,13 @@ public class PaymentProcessingFrame extends JFrame {
 
     private void handleConfirmation(int resId, ReservationTablePanel parent) {
         try {
-            double cashReceived = Double.parseDouble(txtCash.getText().trim());
+            String cashStr = txtCash.getText().trim();
+            if (cashStr.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Please enter cash received!");
+                return;
+            }
+
+            double cashReceived = Double.parseDouble(cashStr);
             dao.PaymentDB payDB = new dao.PaymentDB();
 
             double discountAmount = payDB.calculateFinalDiscount(totalAmount, txtPromo.getText().trim(), false);
@@ -150,20 +200,18 @@ public class PaymentProcessingFrame extends JFrame {
             String invoiceNo = "INV-" + (System.currentTimeMillis() / 1000) + "-" + resId;
 
             boolean paymentSuccess = payDB.processPayment(
-                    resId,
-                    remainingBalance,
-                    totalAmount,
-                    discountAmount,
-                    "Cash",
-                    "Full Payment",
-                    invoiceNo
+                    resId, remainingBalance, totalAmount, discountAmount,
+                    "Cash", "Full Payment", invoiceNo
             );
 
             if (paymentSuccess) {
-                new dao.ReservationDB().updateStatus(resId, "Confirmed");
-                JOptionPane.showMessageDialog(this, "Full payment received.");
+                new dao.ReservationDB().updateCartStatusByResId(resId, "Checked-In");
+                JOptionPane.showMessageDialog(this, "Payment successful.");
 
-                new OfficialReceiptFrame(resId, guestName, guestId, totalAmount, depositPaid, cashReceived).setVisible(true);
+                String downpaymentDate = payDB.getDownpaymentDate(resId);
+
+                new OfficialReceiptFrame(resId, guestName, guestId, totalAmount, depositPaid,
+                        cashReceived, downpaymentDate, invoiceNo).setVisible(true);
 
                 parent.refreshTable();
                 this.dispose();
@@ -172,15 +220,13 @@ public class PaymentProcessingFrame extends JFrame {
             JOptionPane.showMessageDialog(this, "Please enter a valid amount.");
         }
     }
-
     class OfficialReceiptFrame extends JFrame {
-        public OfficialReceiptFrame(int resId, String guestName, int guestId, double total, double paid, double cash) {
+        public OfficialReceiptFrame(int resId, String guestName, int guestId, double total,
+                                    double paid, double cash, String downpaymentDate, String invoiceNo) {
             setTitle("Official Receipt - Aurelia Grand");
-            setSize(400, 600);
+            setSize(420, 650);
             setLocationRelativeTo(null);
             setLayout(new BorderLayout());
-
-            String invoiceNo = "INV-" + (System.currentTimeMillis() / 1000) + "-" + resId;
 
             JPanel paper = new JPanel();
             paper.setBackground(Color.WHITE);
@@ -188,42 +234,45 @@ public class PaymentProcessingFrame extends JFrame {
             paper.setLayout(new BoxLayout(paper, BoxLayout.Y_AXIS));
 
             JLabel header = new JLabel("AURELIA GRAND HOTEL");
-            header.setFont(new Font("Serif", Font.BOLD, 20));
+            header.setFont(new Font("Serif", Font.BOLD, 22));
             header.setAlignmentX(Component.CENTER_ALIGNMENT);
 
             JLabel subHeader = new JLabel("Official Payment Receipt");
-            subHeader.setFont(new Font("SansSerif", Font.PLAIN, 12));
             subHeader.setAlignmentX(Component.CENTER_ALIGNMENT);
 
             JTextArea details = new JTextArea();
             details.setEditable(false);
             details.setFont(new Font("Monospaced", Font.PLAIN, 12));
 
+            // VAT CALCULATIONS (Philippine Standard 12%)
+            double vatRate = 0.12;
+            double vatableSales = total / (1 + vatRate);
+            double vatAmount = total - vatableSales;
+
             dao.PaymentDB payDB = new dao.PaymentDB();
-            double discountAmount = payDB.calculateFinalDiscount(total, txtPromo.getText().trim(), false);
-            double finalBalance = (total - paid) - discountAmount;
+            double promoDiscount = payDB.calculateFinalDiscount(total, txtPromo.getText().trim(), false);
+            double finalBalancePaid = remainingBalance;
 
             details.setText(
                     "========================================\n" +
                             " INVOICE NO:    " + invoiceNo + "\n" +
                             " DATE:          " + java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")) + "\n" +
                             "========================================\n" +
-                            " GUEST DETAILS:\n" +
-                            " Name:          " + guestName.toUpperCase() + "\n" +
-                            " Guest ID:      " + guestId + "\n" +
-                            " Reservation ID:" + resId + "\n" +
+                            " GUEST: " + guestName.toUpperCase() + "\n" +
+                            " RES ID: #" + resId + "\n" +
                             "----------------------------------------\n" +
-                            " PAYMENT SUMMARY:\n" +
-                            " Total Amount:   P " + String.format("%,12.2f", total) + "\n" +
-                            " Downpayment:    P " + String.format("%,12.2f", paid) + "\n" +
-                            " DISCOUNT:       P " + String.format("%,12.2f", discountAmount) + "\n" + // Add this line!
+                            " VATABLE SALES:  P " + String.format("%,12.2f", vatableSales) + "\n" +
+                            " VAT AMOUNT(12%):P " + String.format("%,12.2f", vatAmount) + "\n" +
+                            " TOTAL AMOUNT:   P " + String.format("%,12.2f", total) + "\n" +
                             "----------------------------------------\n" +
-                            " BALANCE PAID:   P " + String.format("%,12.2f", finalBalance) + "\n" +
+                            " DOWNPAYMENT ON: " + downpaymentDate + "\n" +
+                            " BALANCE PAID:   P " + String.format("%,12.2f", finalBalancePaid) + "\n" +
+                            "----------------------------------------\n" +
                             " CASH RECEIVED:  P " + String.format("%,12.2f", cash) + "\n" +
-                            " CHANGE GIVEN:   P " + String.format("%,12.2f", (cash - finalBalance)) + "\n" +
-                            "========================================\n\n" +
-                            "       THANK YOU FOR CHOOSING\n" +
-                            "           AURELIA GRAND!"
+                            " CHANGE GIVEN:   P " + String.format("%,12.2f", cash - finalBalancePaid) + "\n" +
+                            "========================================\n" +
+                            "    THANK YOU FOR STAYING WITH US!\n" +
+                            "========================================\n"
             );
 
             paper.add(header);
@@ -233,8 +282,7 @@ public class PaymentProcessingFrame extends JFrame {
 
             add(new JScrollPane(paper), BorderLayout.CENTER);
 
-            JButton btnClose = new JButton("Close Receipt");
-            btnClose.setPreferredSize(new Dimension(0, 40));
+            JButton btnClose = new JButton("Close & Finish");
             btnClose.addActionListener(e -> this.dispose());
             add(btnClose, BorderLayout.SOUTH);
         }

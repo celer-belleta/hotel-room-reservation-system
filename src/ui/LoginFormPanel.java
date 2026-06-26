@@ -17,14 +17,16 @@ public class LoginFormPanel extends JPanel {
 
     public LoginFormPanel(JFrame parentFrame) {
         this.parentFrame = parentFrame;
+        Color matchedNavy = new Color(44, 62, 80);
 
-        setBackground(Color.WHITE);
+        setBackground(matchedNavy);
         setLayout(new GridBagLayout());
 
         // BOX
         JPanel contentWrap = new JPanel(new GridBagLayout());
         contentWrap.setBackground(Color.WHITE);
-        contentWrap.setBorder(BorderFactory.createLineBorder(Color.GRAY, 1));
+        contentWrap.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));
+        contentWrap.setPreferredSize(new Dimension(500, 450));
 
         GridBagConstraints wrapGbc = new GridBagConstraints();
         wrapGbc.insets = new Insets(5, 20, 5, 20);
@@ -32,10 +34,8 @@ public class LoginFormPanel extends JPanel {
 
         JLabel title = new JLabel("LOGIN", SwingConstants.CENTER);
         title.setFont(new Font("Arial", Font.BOLD, 28));
-        wrapGbc.gridx = 0;
-        wrapGbc.gridy = 0;
-        wrapGbc.gridwidth = 2;
-        wrapGbc.anchor = GridBagConstraints.CENTER;
+        title.setForeground(matchedNavy); // Navy Title
+        wrapGbc.gridy = 0; wrapGbc.gridwidth = 2;
         wrapGbc.insets = new Insets(20, 20, 20, 20);
         contentWrap.add(title, wrapGbc);
 
@@ -74,8 +74,11 @@ public class LoginFormPanel extends JPanel {
         // LOGIN BUTTON
         btnLogin = new JButton("LOGIN");
         btnLogin.setFont(new Font("Arial", Font.BOLD, 18));
-        btnLogin.setFocusPainted(false);
-        btnLogin.setContentAreaFilled(false);
+        btnLogin.setBackground(matchedNavy);
+        btnLogin.setForeground(Color.WHITE);
+
+        btnLogin.setOpaque(true);
+        btnLogin.setBorderPainted(false);
         btnLogin.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btnLogin.setPreferredSize(new Dimension(200, 40));
         wrapGbc.gridx = 0;
@@ -140,14 +143,21 @@ public class LoginFormPanel extends JPanel {
             String user = txtUsername.getText();
             String pass = new String(txtPassword.getPassword());
 
-            // Try Staff Login (Admins/Clerks)
-            String staffSql = "SELECT role FROM users WHERE username=? AND password=?";
+            String staffSql = "SELECT id, first_name, last_name, role FROM users WHERE username=? AND password=?";
             try (PreparedStatement ps = conn.prepareStatement(staffSql)) {
                 ps.setString(1, user);
                 ps.setString(2, pass);
                 ResultSet rs = ps.executeQuery();
 
                 if (rs.next()) {
+                    model.User loggedInUser = new model.User();
+                    loggedInUser.setId(rs.getInt("id"));
+                    loggedInUser.setFirstName(rs.getString("first_name"));
+                    loggedInUser.setLastName(rs.getString("last_name"));
+                    loggedInUser.setRole(rs.getString("role"));
+
+                    Session.login(loggedInUser);
+
                     String role = rs.getString("role");
                     parentFrame.dispose();
 
@@ -156,7 +166,7 @@ public class LoginFormPanel extends JPanel {
                     } else if (role.equalsIgnoreCase("Clerk")) {
                         new ClerkDashboard().setVisible(true);
                     }
-                    return; // Exit if staff found
+                    return;
                 }
             }
 
@@ -179,5 +189,4 @@ public class LoginFormPanel extends JPanel {
             e.printStackTrace();
             lblError.setText("Error occurred");
         }
-    }
-}
+    }}

@@ -68,6 +68,7 @@ public class GuestDashboard extends JFrame {
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (cardName.equals("LOGOUT")) {
+                    ui.Session.logout();
                     dispose();
                     new MainFrame().setVisible(true);
                 } else {

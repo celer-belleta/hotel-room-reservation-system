@@ -6,6 +6,7 @@ import java.awt.*;
 public class MainFrame extends JFrame {
     private CardLayout cardLayout;
     private JPanel mainContent;
+    private final Color MATCHED_NAVY = new Color(44, 62, 80);
 
     public MainFrame() {
         setTitle("Hotel Room Reservation System");
@@ -17,14 +18,20 @@ public class MainFrame extends JFrame {
         navBar.setBackground(Color.WHITE);
 
         JButton btnAbout = new JButton("ABOUT");
+        JButton btnTerms = new JButton("TERMS & CONDITIONS");
+        JButton btnPreview = new JButton("OFFERS");
         JButton btnRooms = new JButton("ROOMS");
         JButton btnLogin = new JButton("LOGIN");
 
         styleNavButton(btnAbout);
+        styleNavButton(btnTerms);
+        styleNavButton(btnPreview);
         styleNavButton(btnRooms);
         styleNavButton(btnLogin);
 
         navBar.add(btnAbout);
+        navBar.add(btnTerms);
+        navBar.add(btnPreview);
         navBar.add(btnRooms);
         navBar.add(btnLogin);
         add(navBar, BorderLayout.NORTH);
@@ -34,10 +41,12 @@ public class MainFrame extends JFrame {
         mainContent.setBackground(Color.WHITE);
 
         mainContent.add(createAboutPage(), "ABOUT_PAGE");
+        mainContent.add(new TermsPanel(), "TERMS_PAGE");
+        mainContent.add(new RoomPreviewPanel(this), "PREVIEW_PAGE");
         mainContent.add(createRoomsPage(), "ROOMS_PAGE");
         mainContent.add(new LoginFormPanel(this), "LOGIN_PAGE");
         mainContent.add(new SignUpPanel(this), "SIGNUP_PAGE");
-         mainContent.add(new ForgotPasswordPanel(this), "FORGOT_PASSWORD_PAGE");
+        mainContent.add(new ForgotPasswordPanel(this), "FORGOT_PASSWORD_PAGE");
 
         mainContent.add(new SuperiorDetailsPanel(null), "SUPERIOR_ROOM_DETAILS");
         mainContent.add(new DeluxeDetailsPanel(null), "DELUXE_ROOM_DETAILS");
@@ -48,6 +57,8 @@ public class MainFrame extends JFrame {
 
         // BUTTON ACTIONS
         btnAbout.addActionListener(e -> cardLayout.show(mainContent, "ABOUT_PAGE"));
+        btnTerms.addActionListener(e -> cardLayout.show(mainContent, "TERMS_PAGE"));
+        btnPreview.addActionListener(e -> cardLayout.show(mainContent, "PREVIEW_PAGE"));
         btnRooms.addActionListener(e -> cardLayout.show(mainContent, "ROOMS_PAGE"));
         btnLogin.addActionListener(e -> cardLayout.show(mainContent, "LOGIN_PAGE"));
     }
@@ -87,6 +98,12 @@ public class MainFrame extends JFrame {
     }
 
     public void showCard(String cardName) {
+        if (cardName.equals("LOGIN_PAGE") || cardName.equals("SIGNUP_PAGE") || cardName.equals("FORGOT_PASSWORD_PAGE")) {
+            mainContent.setBackground(MATCHED_NAVY);
+        } else {
+            mainContent.setBackground(Color.WHITE);
+        }
+
         cardLayout.show(mainContent, cardName);
     }
 }
