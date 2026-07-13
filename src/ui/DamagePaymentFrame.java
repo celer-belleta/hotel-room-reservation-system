@@ -35,7 +35,6 @@ public class DamagePaymentFrame extends JFrame {
         top.add(lblValue);
         add(top, BorderLayout.NORTH);
 
-        // --- CENTER PANEL: PAYMENT INPUT ---
         JPanel center = new JPanel(null);
         center.setOpaque(false);
 

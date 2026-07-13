@@ -32,7 +32,6 @@ public class DeluxeDetailsPanel extends JPanel {
             }
         };
         mainImage.setPreferredSize(new Dimension(850, 480));
-        // Subtle white border for the image
         mainImage.setBorder(BorderFactory.createLineBorder(new Color(255, 255, 255, 40), 1));
 
         JPanel imageWrapper = new JPanel(new BorderLayout());

@@ -1,7 +1,27 @@
-﻿target/
+﻿# Maven
+target/
+
+# IntelliJ IDEA
 .idea/
 *.iml
 out/
-gen/
-.DS_Store
+
+# VS Code
 .vscode/
+
+# Generated sources
+gen/
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+Desktop.ini
+
+# Logs
+*.log
+
+# Java crash logs
+hs_err_pid*
+replay_pid*

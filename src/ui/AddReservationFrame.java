@@ -125,7 +125,7 @@ public class AddReservationFrame extends JFrame {
 
             if (resId != -1) {
                 JOptionPane.showMessageDialog(this, "Booking Successful! ID: " + resId);
-                if (parentPanel != null) parentPanel.refreshTable(); // Refreshes the main table
+                if (parentPanel != null) parentPanel.refreshTable();
                 dispose();
             }
         } catch (IllegalArgumentException ex) {

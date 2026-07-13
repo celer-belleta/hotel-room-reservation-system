@@ -35,7 +35,7 @@ public class PaymentProcessingFrame extends JFrame {
         this.txtPromo = new JTextField();
 
         setTitle("Payment Processing - Reservation #" + resId);
-        setSize(400, 600); // Increased height slightly to fit new info
+        setSize(400, 600);
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
         getContentPane().setBackground(BG_COLOR);
@@ -45,7 +45,6 @@ public class PaymentProcessingFrame extends JFrame {
         double vatableSales = totalAmount / (1 + vatRate);
         double vatAmount = totalAmount - vatableSales;
 
-        // Changed GridLayout from 3 to 4 to accommodate VAT row
         JPanel topPanel = new JPanel(new GridLayout(4, 1, 0, 8));
         topPanel.setBackground(Color.WHITE);
         topPanel.setBorder(BorderFactory.createCompoundBorder(
@@ -63,7 +62,6 @@ public class PaymentProcessingFrame extends JFrame {
         row2.add(new JLabel("Downpayment Paid:"), BorderLayout.WEST);
         row2.add(new JLabel("₱" + String.format("%,.2f", depositPaid)), BorderLayout.EAST);
 
-        // NEW: VAT BREAKDOWN ROW
         JPanel rowVat = new JPanel(new BorderLayout());
         rowVat.setOpaque(false);
         JLabel lblVatInfo = new JLabel("Inclusive of 12% VAT:");
@@ -89,7 +87,7 @@ public class PaymentProcessingFrame extends JFrame {
 
         topPanel.add(row1);
         topPanel.add(row2);
-        topPanel.add(rowVat); // Added the new VAT row
+        topPanel.add(rowVat);
         topPanel.add(row3);
         add(topPanel, BorderLayout.NORTH);
 

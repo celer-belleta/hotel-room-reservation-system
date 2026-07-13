@@ -20,12 +20,10 @@ public class GuestTablePanel extends JPanel {
     public GuestTablePanel() {
         this.guestDB = new GuestDB();
 
-        // Consistent Background with Admin Dashboard
         setBackground(BG_COLOR);
         setLayout(new BorderLayout());
         setBorder(BorderFactory.createEmptyBorder(20, 40, 40, 40));
 
-        // --- HEADER SECTION ---
         JPanel header = new JPanel(new BorderLayout());
         header.setBackground(BG_COLOR);
         header.setBorder(BorderFactory.createEmptyBorder(0, 0, 20, 0)); // Padding below actions
@@ -34,7 +32,6 @@ public class GuestTablePanel extends JPanel {
         title.setFont(new Font("Serif", Font.BOLD, 30));
         header.add(title, BorderLayout.WEST);
 
-        // Actions Panel: Kept outside the table border
         JPanel actions = new JPanel(new FlowLayout(FlowLayout.RIGHT, 30, 0));
         actions.setBackground(BG_COLOR);
         actions.add(createActionLabel("Register Guest", "ADD"));
@@ -44,7 +41,6 @@ public class GuestTablePanel extends JPanel {
 
         add(header, BorderLayout.NORTH);
 
-        // --- TABLE SECTION ---
         String[] columns = {"ID", "First Name", "Last Name", "Contact", "ID Type", "ID Number", "Username", "Password"};
         tableModel = new DefaultTableModel(columns, 0) {
             @Override
@@ -58,7 +54,6 @@ public class GuestTablePanel extends JPanel {
         guestTable.setSelectionBackground(new Color(245, 230, 200));
         guestTable.setFocusable(false);
 
-        // Table Header Styling
         guestTable.getTableHeader().setBackground(Color.WHITE);
         guestTable.getTableHeader().setFont(new Font("SansSerif", Font.BOLD, 12));
         guestTable.getTableHeader().setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY));
@@ -76,7 +71,6 @@ public class GuestTablePanel extends JPanel {
 
         loadGuests();
 
-        // WRAPPING THE TABLE: Adding border lines only around the table area
         JPanel tableContainer = new JPanel(new BorderLayout());
         tableContainer.setBackground(Color.WHITE);
         tableContainer.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1)); // The Table Border
@@ -84,7 +78,7 @@ public class GuestTablePanel extends JPanel {
         JScrollPane scrollPane = new JScrollPane(guestTable);
         scrollPane.setBackground(Color.WHITE);
         scrollPane.getViewport().setBackground(Color.WHITE);
-        scrollPane.setBorder(BorderFactory.createEmptyBorder()); // Remove internal scroll border
+        scrollPane.setBorder(BorderFactory.createEmptyBorder());
 
         tableContainer.add(scrollPane, BorderLayout.CENTER);
         add(tableContainer, BorderLayout.CENTER);

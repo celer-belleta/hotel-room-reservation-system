@@ -17,7 +17,7 @@ public class RoomBookingPanel extends JPanel {
     private JPanel dynamicContentPanel;
     private RoomDB roomDB;
 
-    private int startMonthIndex = 4; // May 2026
+    private int startMonthIndex = Calendar.getInstance().get(Calendar.MONTH);
     private double currentTotal = 0.0;
     private int cartItemCount = 0;
 
@@ -47,6 +47,10 @@ public class RoomBookingPanel extends JPanel {
         this.loggedInGuestId = guestId;
         this.viewBookingsRef = vbp;
         this.roomDB = new RoomDB();
+
+        if (this.startMonthIndex > 10) {
+            this.startMonthIndex = 10;
+        }
 
         setLayout(new BorderLayout());
         setBackground(NAVY_BLUE);
@@ -433,9 +437,26 @@ public class RoomBookingPanel extends JPanel {
         JPanel nav = new JPanel(new BorderLayout());
         nav.setBackground(NAVY_BLUE);
         nav.setMaximumSize(new Dimension(1600, 40));
-        JButton b1 = new JButton("❮"); JButton b2 = new JButton("❯");
-        b1.addActionListener(e -> { if(startMonthIndex > 0) { startMonthIndex--; updateCalendarDisplay(); }});
-        b2.addActionListener(e -> { if(startMonthIndex < 10) { startMonthIndex++; updateCalendarDisplay(); }});
+
+        JButton b1 = new JButton("❮");
+        JButton b2 = new JButton("❯");
+
+        int currentSystemMonth = Calendar.getInstance().get(Calendar.MONTH);
+
+        b1.addActionListener(e -> {
+            if(startMonthIndex > currentSystemMonth) {
+                startMonthIndex--;
+                updateCalendarDisplay();
+            }
+        });
+
+        b2.addActionListener(e -> {
+            if(startMonthIndex < 10) {
+                startMonthIndex++;
+                updateCalendarDisplay();
+            }
+        });
+
         nav.add(b1, BorderLayout.WEST); nav.add(b2, BorderLayout.EAST);
         return nav;
     }

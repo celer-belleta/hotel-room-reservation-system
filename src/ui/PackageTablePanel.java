@@ -126,7 +126,7 @@ public class PackageTablePanel extends JPanel {
             try {
                 double newPrice = Double.parseDouble(txtPrice.getText().trim());
                 if (packageDB.updatePackage(id, txtName.getText().trim(), newPrice, txtDesc.getText().trim())) {
-                    loadPackages(); // Refresh the table[cite: 17]
+                    loadPackages();
                     JOptionPane.showMessageDialog(this, "Package updated successfully!");
                 }
             } catch (NumberFormatException ex) {

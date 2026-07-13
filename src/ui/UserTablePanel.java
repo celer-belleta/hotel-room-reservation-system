@@ -27,7 +27,7 @@ public class UserTablePanel extends JPanel {
 
         JPanel header = new JPanel(new BorderLayout());
         header.setBackground(BG_COLOR);
-        header.setBorder(BorderFactory.createEmptyBorder(0, 0, 20, 0)); // Spacing below labels
+        header.setBorder(BorderFactory.createEmptyBorder(0, 0, 20, 0));
 
         JLabel title = new JLabel("Users");
         title.setFont(new Font("Serif", Font.BOLD, 30));
